@@ -18,7 +18,6 @@
         font-family: sans-serif;
     }
 
-
     .route-line {
         position: absolute;
         top: 50%;
@@ -53,8 +52,26 @@
         max-width: 300px;
         margin-left: auto;
         margin-right: auto;
+        text-align: center;
     }
+
+    .label-container span {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .label-container span:first-child {
+        text-align: left;
+    }
+
+    .label-container span:last-child {
+        text-align: right;
+    }
+
 </style>
+
 
 <!-- Start::row-1 -->
 <div class="mt-1">
@@ -85,10 +102,10 @@
                             </div>
                         </div>
                         <div class="label-container">
-                            <span>{{ str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->return_kota_nama)  }}</span>
-                            <span>{{ str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->depart_kota_nama)  }}</span>
-                            <span>{{ str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->return_kota_nama)  }}</span>
-                        </div>
+                            <span>{{ ucwords(strtolower(str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->return_kota_nama))) }}</span>
+                            <span>{{ ucwords(strtolower(str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->depart_kota_nama))) }}</span>
+                            <span>{{ ucwords(strtolower(str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->return_kota_nama))) }}</span>
+                        </div>                                
                     </div>
                 </div>
                 <div class="card-body">

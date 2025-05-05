@@ -308,10 +308,9 @@
 
         // Handle reset button
         $('#resetFilter').on('click', function() {
-            $('#daterange').val(''); // Clear date range input
-            $('#truk_id').val(''); // Reset truk_id to empty
-            $('#is_done').val(''); // Reset is_done to empty
-            // Optionally trigger daterangepicker to reset to default range
+            $('#daterange').val('');
+            $('#truk_id').val('');
+            $('#is_done').val('');
             $('#daterange').data('daterangepicker').setStartDate(moment());
             $('#daterange').data('daterangepicker').setEndDate(moment());
         });

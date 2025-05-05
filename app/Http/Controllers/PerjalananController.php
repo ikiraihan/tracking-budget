@@ -21,8 +21,7 @@ class PerjalananController extends Controller
         $defaultRangeTanggal = Carbon::now()->startOfMonth()->toDateString() . ' - ' . Carbon::now()->endOfMonth()->toDateString();
         $dateRange = $request->date_range ?? $defaultRangeTanggal;
 
-        $perjalanans = Perjalanan::query()
-            ->when($isDone != null, function ($query) use ($isDone) {
+        $perjalanans = Perjalanan::when($isDone != null, function ($query) use ($isDone) {
                 return $query->where('is_done', $isDone);
             })
             ->when($trukId, function ($query) use ($trukId) {

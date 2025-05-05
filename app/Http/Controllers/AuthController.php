@@ -117,7 +117,7 @@ class AuthController extends Controller
 
             Auth::login($user);
 
-            return redirect('/perjalanan/form');
+            return redirect('/dashboard');
         } catch (\Exception $e) {
             return back()->withInput()
             ->with(['error' => $e->getMessage()]);
