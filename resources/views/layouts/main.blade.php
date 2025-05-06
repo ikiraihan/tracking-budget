@@ -1628,7 +1628,7 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const targetInputs = ["budget", "expenditure", "income"];
+            const targetInputs = ["uang_pengembalian_tol", "uang_subsidi_tol", "uang_kembali","uang_setoran"];
         
             function formatRupiah(angka) {
                 return angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");

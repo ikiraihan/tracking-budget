@@ -89,29 +89,25 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <!-- Rute Visual -->
+                <div class="d-flex align-items-center">
                     <div class="w-100">
-                        <div class="route-wrapper">
-                            <div class="route-label">Rute</div>
-                            <div class="route-line"></div>
-                            <div class="route-dots">
-                                <div class="dot"></div>
-                                <div class="dot"></div>
-                                <div class="dot"></div>
-                            </div>
-                        </div>
-                        <div class="label-container">
-                            <span>{{ ucwords(strtolower(str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->return_kota_nama))) }}</span>
-                            <span>{{ ucwords(strtolower(str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->depart_kota_nama))) }}</span>
-                            <span>{{ ucwords(strtolower(str_replace(['KABUPATEN', 'KOTA'], '', $perjalanan->return_kota_nama))) }}</span>
-                        </div>                                
+                        <div class="main-content-label text-center fs-27">{{ $perjalanan->hash }}</div>                         
                     </div>
                 </div>
                 <div class="card-body">
                     {{-- <div class="mb-4 main-content-label">Personal Information</div> --}}
                     <form class="form-horizontal">
                         {{-- <div class="mb-4 main-content-label">Name</div> --}}
+                        {{-- <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">ID Perjalanan</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light" value="{{ $perjalanan->hash ?? '-'}}" readonly>
+                                </div>
+                            </div>
+                        </div> --}}
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
@@ -151,34 +147,74 @@
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-medium">Budget</label>
+                                    <label class="form-label fw-medium">Jalur</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->budget ?? 0, 0, ',', '.') }}" readonly>
+                                    <input type="text" class="form-control bg-light" 
+                                    @if($perjalanan->jalur == 'full-tol')
+                                        value="Full Tol" 
+                                    @elseif($perjalanan->jalur == 'setengah-tol')
+                                        value="Setengah Tol" 
+                                    @elseif($perjalanan->jalur == 'bawah')
+                                        value="Bawah" 
+                                    @else
+                                        value="-"
+                                    @endif
+                                    readonly>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-medium">Pemasukan</label>
+                                    <label class="form-label fw-medium">Pengembalian Tol</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->income ?? 0, 0, ',', '.') }}" readonly>
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->uang_pengembalian_tol ?? 0, 0, ',', '.') }}" readonly>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-medium">Pengeluaran</label>
+                                    <label class="form-label fw-medium">Subsidi Tol</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->expenditure ?? 0, 0, ',', '.') }}" readonly>
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->uang_subsidi_tol ?? 0, 0, ',', '.') }}" readonly>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Kembali</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->uang_kembali ?? 0, 0, ',', '.') }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Sisa</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->sisa ?? 0, 0, ',', '.') }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Bayaran Supir</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->bayaran_supir ?? 0, 0, ',', '.') }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
                                     <label class="form-label fw-medium">Total</label>
@@ -191,13 +227,15 @@
                                         bg-danger text-white
                                     @elseif(($perjalanan->total ?? 0) > 0)
                                         bg-success text-white
+                                    @else
+                                        bg-light
                                     @endif" 
                                     placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->total ?? 0, 0, ',', '.') }}"
                                     readonly>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-4 main-content-label">Info Supir</div>
+                        </div> --}}
+                        <div class="mt-3 main-content-label text-center">Info Supir</div>
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
@@ -218,7 +256,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-4 main-content-label">Info Truk</div>
+                        <div class="mt-3 main-content-label text-center">Info Truk</div>
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">

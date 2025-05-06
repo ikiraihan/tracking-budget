@@ -16,64 +16,30 @@
                         <form action="{{ route('perjalanan.store') }}" method="POST">
                             @csrf                        
                             <div class="row">
-                                {{-- <div class="col-md-6">
+                                <div class="col-md-6 mb-3">
                                     <div class="form-group mb-3">
-                                        <label for="depart_provinsi_id">Provinsi</label>
-                                        <select class="form-control" data-trigger id="depart_provinsi_id" name="depart_provinsi_id" required>
-                                            <option selected disabled>Pilih Provinsi</option>
-                                            @foreach ($provinsis as $provinsi)
-                                                <option value="{{ $provinsi->id }}">{{ $provinsi->nama }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>  --}}
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="depart_kota_id">Kota Asal</label>
-                                        <select id="depart_kota_id" name="depart_kota_id" class="form-control" data-trigger required>
+                                        <label for="jalur">Jalur</label>                                        
+                                        <select id="jalur" name="jalur" class="form-control" required>
                                             <option selected disabled>Pilih Kota</option>
-                                            @foreach ($kotas as $kota)
-                                                <option value="{{ $kota->id }}">{{ $kota->nama }}</option>
-                                            @endforeach
-                                        </select>
+                                            <option value="full-tol">Full Tol</option>
+                                            <option value="setengah-tol">Setengah Tol</option>
+                                            <option value="bawah">Bawah</option>
+                                        </select>                                                                          
                                     </div>
                                 </div> 
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="return_kota_id">Kota Tujuan</label>
-                                        <select id="return_kota_id" name="return_kota_id" class="form-control" data-trigger required>
-                                            <option selected disabled>Pilih Kota</option>
-                                            @foreach ($kotas as $kota)
-                                                <option value="{{ $kota->id }}">{{ $kota->nama }}</option>
-                                            @endforeach
-                                        </select>                       
-                                    </div>
-                                </div>  
-                            </div>
-                            {{-- <label class="d-block text-center fw-bold"><h6>Tujuan</h6></label> --}}
-                            {{-- <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="return_provinsi_id">Provinsi</label>
-                                        <select id="return_provinsi_id" name="return_provinsi_id" class="form-control" data-trigger required>
-                                            <option selected disabled>Pilih Provinsi</option>
-                                            @foreach ($provinsis as $provinsi)
-                                                <option value="{{ $provinsi->id }}">{{ $provinsi->nama }}</option>
-                                            @endforeach
-                                        </select>                             
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label" for="uang_pengembalian_tol">Uang Pengembalian Tol</label>
+                                    <input type="text" id="uang_pengembalian_tol" name="uang_pengembalian_tol" class="form-control bg-secondary-transparent text-black" placeholder="0" readonly>
                                 </div>
-                            </div> --}}
-                        
-                            <label class="d-block text-center fw-bold"><h6>Detail</h6></label>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="tanggal_berangkat" class="form-label" required>Tanggal Keberangkatan</label>
                                     <input type="date" class="form-control" name="tanggal_berangkat" id="tanggal_berangkat">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label" for="budget" required>Budget Kantor</label>
-                                    <input type="text" id="budget" name="budget" class="form-control" placeholder="Masukkan Budget.." required>
+                                    <label class="form-label" for="uang_kembali" required>Uang Kembali</label>
+                                    <input type="text" id="uang_kembali" name="uang_kembali" class="form-control" placeholder="Masukkan Uang Kembali.." required>
                                 </div>
                             </div>
                         
@@ -90,14 +56,6 @@
                                     <label for="tanggal_kembali" class="form-label">Tanggal Kembali</label>
                                     <input type="date" class="form-control" id="tanggal_kembali" name="tanggal_kembali">
                                 </div>
-                                <div class="col-md-6 mb-3" id="formPengeluaran" style="display: none;">
-                                    <label for="expenditure" class="form-label">Pengeluaran</label>
-                                    <input type="text" class="form-control" id="expenditure" name="expenditure" placeholder="Masukkan Pengeluaran..">
-                                </div>
-                                <div class="col-md-6 mb-3" id="formPendapatan" style="display: none;">
-                                    <label for="income" class="form-label">Pendapatan</label>
-                                    <input type="text" class="form-control" id="income" name="income" placeholder="Masukkan Pendapatan..">
-                                </div>   
                             </div>
                         
                             <div class="col-md-12">
@@ -119,23 +77,34 @@
         const isChecked = document.getElementById('gridCheck').checked;
 
         const returnDate = document.getElementById('return_date');
-        const expenditure = document.getElementById('expenditure');
-        const income = document.getElementById('income');
 
         document.getElementById('formDate').style.display = isChecked ? 'block' : 'none';
-        document.getElementById('formPengeluaran').style.display = isChecked ? 'block' : 'none';
-        document.getElementById('formPendapatan').style.display = isChecked ? 'block' : 'none';
 
         if (isChecked) {
             returnDate.setAttribute('required', 'required');
-            expenditure.setAttribute('required', 'required');
-            income.setAttribute('required', 'required');
         } else {
             returnDate.removeAttribute('required');
-            expenditure.removeAttribute('required');
-            income.removeAttribute('required');
         }
     }
+    document.addEventListener("DOMContentLoaded", function () {
+        const jalurSelect = document.getElementById("jalur");
+        const uangPengembalianInput = document.getElementById("uang_pengembalian_tol");
+
+        jalurSelect.addEventListener("change", function () {
+            const value = this.value;
+            if (value === "full-tol") {
+                uangPengembalianInput.value = 4200000;
+            } else if (value === "setengah-tol") {
+                uangPengembalianInput.value = 3750000;
+            } else if (value === "bawah") {
+                uangPengembalianInput.value = 3250000;
+            } else {
+                uangPengembalianInput.value = "";
+            }
+
+            uangPengembalianInput.dispatchEvent(new Event("input"));
+        });
+    });
 </script>
 <script>
 // document.addEventListener('DOMContentLoaded', function () {

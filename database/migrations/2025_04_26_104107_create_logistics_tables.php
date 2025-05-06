@@ -16,6 +16,7 @@ class CreateLogisticsTables extends Migration
             $table->id();
             $table->string('no_polisi')->nullable();
             $table->string('nama')->nullable();
+            $table->text('deskripsi')->nullable();
             $table->string('path_photo')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -43,42 +44,59 @@ class CreateLogisticsTables extends Migration
             $table->softDeletes();
         });
         
-
-        // PROVINSI table
-        Schema::create('provinsi', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama')->nullable();
-            $table->string('slug')->nullable()->unique();
-            $table->timestamps();
-        });
-
-        // KOTA table
-        Schema::create('kota', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('provinsi_id')->nullable()->constrained('provinsi')->onDelete('cascade');
-            $table->string('nama')->nullable();
-            $table->string('slug')->nullable()->unique();
-            $table->timestamps();
-        });
-
-        // PERJALANAN table
         Schema::create('perjalanan', function (Blueprint $table) {
             $table->id();
+            $table->string('hash')->unique();
             $table->foreignId('truk_id')->nullable()->constrained('truk')->onDelete('cascade');
             $table->foreignId('supir_id')->nullable()->constrained('supir')->onDelete('cascade');
-            $table->foreignId('depart_provinsi_id')->nullable()->constrained('provinsi')->onDelete('cascade');
-            $table->foreignId('depart_kota_id')->nullable()->constrained('kota')->onDelete('cascade');
-            $table->foreignId('return_provinsi_id')->nullable()->constrained('provinsi')->onDelete('cascade');
-            $table->foreignId('return_kota_id')->nullable()->constrained('kota')->onDelete('cascade');
             $table->date('tanggal_berangkat')->nullable();
             $table->date('tanggal_kembali')->nullable();
-            $table->bigInteger('budget')->default(0);
-            $table->bigInteger('income')->default(0);
-            $table->bigInteger('expenditure')->default(0);
+            $table->enum('jalur',['full-tol','setengah-tol','bawah'])->nullable();
+            $table->bigInteger('uang_pengembalian_tol')->default(0);
+            $table->bigInteger('uang_subsidi_tol')->default(0);
+            $table->bigInteger('uang_kembali')->default(0);
+            $table->bigInteger('uang_setoran')->default(0);
+            $table->string('path_struk_kembali')->nullable();
             $table->boolean('is_done')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
+
+        // PROVINSI table
+        // Schema::create('provinsi', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('nama')->nullable();
+        //     $table->string('slug')->nullable()->unique();
+        //     $table->timestamps();
+        // });
+
+        // KOTA table
+        // Schema::create('kota', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('provinsi_id')->nullable()->constrained('provinsi')->onDelete('cascade');
+        //     $table->string('nama')->nullable();
+        //     $table->string('slug')->nullable()->unique();
+        //     $table->timestamps();
+        // });
+
+        // PERJALANAN table
+        // Schema::create('perjalanan', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('truk_id')->nullable()->constrained('truk')->onDelete('cascade');
+        //     $table->foreignId('supir_id')->nullable()->constrained('supir')->onDelete('cascade');
+        //     $table->foreignId('depart_provinsi_id')->nullable()->constrained('provinsi')->onDelete('cascade');
+        //     $table->foreignId('depart_kota_id')->nullable()->constrained('kota')->onDelete('cascade');
+        //     $table->foreignId('return_provinsi_id')->nullable()->constrained('provinsi')->onDelete('cascade');
+        //     $table->foreignId('return_kota_id')->nullable()->constrained('kota')->onDelete('cascade');
+        //     $table->date('tanggal_berangkat')->nullable();
+        //     $table->date('tanggal_kembali')->nullable();
+        //     $table->bigInteger('budget')->default(0);
+        //     $table->bigInteger('income')->default(0);
+        //     $table->bigInteger('expenditure')->default(0);
+        //     $table->boolean('is_done')->default(false);
+        //     $table->timestamps();
+        //     $table->softDeletes();
+        // });
     }
 
     /**

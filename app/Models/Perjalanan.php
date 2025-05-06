@@ -14,18 +14,17 @@ class Perjalanan extends Model
     protected $table = 'perjalanan';
 
     protected $fillable = [
+        'hash',
         'truk_id',
         'supir_id',
-        'depart_provinsi_id',
-        'depart_kota_id',
-        'return_provinsi_id',
-        'return_kota_id',
         'tanggal_berangkat',
         'tanggal_kembali',
-        'budget',
-        'budget',
-        'income',
-        'expenditure',
+        'uang_pengembalian_tol',
+        'jalur',
+        'uang_subsidi_tol',
+        'uang_kembali',
+        'uang_setoran',
+        'path_struk_kembali',
         'is_done',
     ];
 

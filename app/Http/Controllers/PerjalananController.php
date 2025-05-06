@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kota;
 use App\Models\Perjalanan;
 use App\Models\Provinsi;
+use App\Models\Supir;
 use App\Models\Truk;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class PerjalananController extends Controller
     {
         $isDone = $request->is_done;
         $trukId = $request->truk_id;
+        $supirId = $request->supir_id;
         $defaultRangeTanggal = Carbon::now()->startOfMonth()->toDateString() . ' - ' . Carbon::now()->endOfMonth()->toDateString();
         $dateRange = $request->date_range ?? $defaultRangeTanggal;
 
@@ -27,6 +29,9 @@ class PerjalananController extends Controller
             ->when($trukId, function ($query) use ($trukId) {
                 return $query->where('truk_id', $trukId);
             })
+            ->when($supirId, function ($query) use ($supirId) {
+                return $query->where('supir_id', $supirId);
+            })
             ->when($dateRange && strpos($dateRange, ' - ') !== false, function ($query) use ($dateRange) {
                 [$startDate, $endDate] = explode(' - ', $dateRange);
                 return $query->whereBetween('tanggal_berangkat', [$startDate, $endDate]);
@@ -34,37 +39,35 @@ class PerjalananController extends Controller
             ->get();
         
         $truks = Truk::all();
+        $supirs = Supir::active()->get();
     
         // with(['truk','supir','departProvinsi','departKota','returnProvinsi','returnKota'])->
 
         $perjalananRemap = $perjalanans->map(function ($perjalanan) {
             return (object)[
                 'id'              => $perjalanan->id,
+                'hash'              => $perjalanan->hash,
                 'truk_id'         => $perjalanan->truk_id,
                 'truk_nama'      => $perjalanan->truk && $perjalanan->truk->nama ? $perjalanan->truk->nama : null,
                 'truk_nopol'      => $perjalanan->truk && $perjalanan->truk->no_polisi ? $perjalanan->truk->no_polisi : null,
                 'supir_id'        => $perjalanan->supir_id,
                 'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
                 'supir_telepon'      => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
-                'depart_provinsi_id'   => $perjalanan->depart_provinsi_id,
-                'depart_provinsi_nama' => $perjalanan->departProvinsi && $perjalanan->departProvinsi->nama ? $perjalanan->departProvinsi->nama : null,
-                'depart_kota_id'   => $perjalanan->depart_kota_id,
-                'depart_kota_nama' => $perjalanan->departKota && $perjalanan->departKota->nama ? $perjalanan->departKota->nama : null,
-                'return_provinsi_id'   => $perjalanan->return_provinsi_id,
-                'return_provinsi_nama' => $perjalanan->returnProvinsi && $perjalanan->returnProvinsi->nama ? $perjalanan->returnProvinsi->nama : null,
-                'return_kota_id'   => $perjalanan->return_kota_id,
-                'return_kota_nama' => $perjalanan->returnKota && $perjalanan->returnKota->nama ? $perjalanan->returnKota->nama : null,
+                'jalur'      => $perjalanan->jalur ? $perjalanan->jalur : null,
+
                 'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
                 'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d F Y'): null,
                 'tanggal_kembali'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali): null,
                 'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d F Y'): null,
 
-                'budget'           => $perjalanan->budget ? $perjalanan->budget : null,
-                'income'           => $perjalanan->income ? $perjalanan->income : null,
-                'expenditure'      => $perjalanan->expenditure ? $perjalanan->expenditure : null,
+                'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
+                'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
+                'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
+                'sisa'             => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali,
+                'uang_setoran'           => $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
+                'bayaran_supir'    => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran,
 
-                'total'            => $perjalanan->budget + $perjalanan->income - $perjalanan->expenditure,
-                
+                'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
                 'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,
             ];
         });
@@ -72,8 +75,10 @@ class PerjalananController extends Controller
         return view('perjalanan.index', [
             'perjalanan' => $perjalananRemap,
             'truks' => $truks,
+            'supirs' => $supirs,
             'isDone' => $isDone ?? null,
             'trukId' => $trukId,
+            'supirId' => $supirId,
             'dateRange' => $dateRange,
         ]);
         
@@ -85,31 +90,28 @@ class PerjalananController extends Controller
         
         $perjalananRemap = (object)[
             'id'              => $perjalanan->id,
+            'hash'              => $perjalanan->hash,
             'truk_id'         => $perjalanan->truk_id,
             'truk_nama'      => $perjalanan->truk && $perjalanan->truk->nama ? $perjalanan->truk->nama : null,
             'truk_nopol'      => $perjalanan->truk && $perjalanan->truk->no_polisi ? $perjalanan->truk->no_polisi : null,
             'supir_id'        => $perjalanan->supir_id,
             'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
             'supir_telepon'      => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
-            'depart_provinsi_id'   => $perjalanan->depart_provinsi_id,
-            'depart_provinsi_nama' => $perjalanan->departProvinsi && $perjalanan->departProvinsi->nama ? $perjalanan->departProvinsi->nama : null,
-            'depart_kota_id'   => $perjalanan->depart_kota_id,
-            'depart_kota_nama' => $perjalanan->departKota && $perjalanan->departKota->nama ? $perjalanan->departKota->nama : null,
-            'return_provinsi_id'   => $perjalanan->return_provinsi_id,
-            'return_provinsi_nama' => $perjalanan->returnProvinsi && $perjalanan->returnProvinsi->nama ? $perjalanan->returnProvinsi->nama : null,
-            'return_kota_id'   => $perjalanan->return_kota_id,
-            'return_kota_nama' => $perjalanan->returnKota && $perjalanan->returnKota->nama ? $perjalanan->returnKota->nama : null,
+            'jalur'      => $perjalanan->jalur ? $perjalanan->jalur : null,
+
             'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
-            'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d M Y'): null,
+            'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d F Y'): null,
             'tanggal_kembali'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali): null,
-            'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d M Y'): null,
+            'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d F Y'): null,
 
-            'budget'           => $perjalanan->budget ? $perjalanan->budget : null,
-            'income'           => $perjalanan->income ? $perjalanan->income : null,
-            'expenditure'      => $perjalanan->expenditure ? $perjalanan->expenditure : null,
+            'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
+            'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
+            'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
+            'sisa'             => $perjalanan->is_done == true ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali : 0,
+            'uang_setoran'           => $perjalanan->is_done == true && $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
+            'bayaran_supir'    => $perjalanan->is_done == true ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran : 0,
 
-            'total'            => $perjalanan->budget + $perjalanan->income - $perjalanan->expenditure,
-              
+            'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
             'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,
         ];
 
@@ -129,10 +131,9 @@ class PerjalananController extends Controller
             'returnProvinsi', 
             'returnKota'
         ])->get();
-        $provinsis = Provinsi::all();
-        $kotas = Kota::all();
+        $jalurs = config('constants.jalur');
 
-        return view('perjalanan.form', compact('perjalanan','provinsis','kotas'));
+        return view('perjalanan.form', compact('perjalanan','jalurs'));
     }
 
     public function store(Request $request)
@@ -146,15 +147,11 @@ class PerjalananController extends Controller
             DB::beginTransaction();
 
             $rules = [
-                // 'depart_provinsi_id' => 'required|exists:provinsi,id',
-                'depart_kota_id' => 'required|exists:kota,id',
-                // 'return_provinsi_id' => 'required|exists:provinsi,id',
-                'return_kota_id' => 'required|exists:kota,id',
                 'tanggal_berangkat' => 'required|date',
-                'budget' => 'required|numeric',
-                'income' => 'nullable|numeric',
                 'tanggal_kembali' => 'nullable|date',
-                'expenditure' => 'nullable|numeric',
+                'uang_pengembalian_tol' => 'nullable|numeric',
+                'uang_kembali' => 'nullable|numeric',
+                'jalur' => 'nullable|in:full-tol,setengah-tol,bawah',
                 'is_done' => 'nullable|boolean',
             ];
 
@@ -165,18 +162,23 @@ class PerjalananController extends Controller
 
             $request->validate($rules);
 
+            $kode = config('constants.kode_jalur.'.$request->jalur) ?? 'XX';
+            $tanggal = now()->format('ymd');
+            $countToday = Perjalanan::whereDate('created_at', now()->toDateString())->count();       
+            $urut = str_pad($countToday + 1, 3, '0', STR_PAD_LEFT);        
+            $hash = "$kode/$tanggal/$urut";
+
             Perjalanan::create([
+                'hash' => $hash,
                 'truk_id' => in_array($role, ['owner', 'admin']) ? $request->truk_id : $trukId,
                 'supir_id' => in_array($role, ['owner', 'admin']) ? $request->supir_id : $supirId,
-                'depart_provinsi_id' => $request->depart_provinsi_id,
-                'depart_kota_id' => $request->depart_kota_id,
-                'return_provinsi_id' => $request->return_provinsi_id,
-                'return_kota_id' => $request->return_kota_id,
                 'tanggal_berangkat' => $request->tanggal_berangkat,
                 'tanggal_kembali' => $request->tanggal_kembali,
-                'budget' => $request->budget,
-                'income' => $request->income ?? 0,
-                'expenditure' => $request->expenditure ?? 0,
+                'jalur' => $request->jalur,
+                'uang_pengembalian_tol' => $request->uang_pengembalian_tol ?? 0,
+                'uang_kembali' => $request->uang_kembali ?? 0,
+                'uang_subsidi_tol' => config('constants.uang.uang_subsidi_tol') ?? 0,
+                'uang_setoran' => config('constants.uang.uang_setoran') ?? 0,
                 'is_done' => $request->is_done ?? false,
             ]);
 
@@ -194,35 +196,32 @@ class PerjalananController extends Controller
     public function edit($id)
     {
         $perjalanan = Perjalanan::findOrFail($id);
-        $kotas = Kota::all();
 
-        return view('perjalanan.edit', compact('perjalanan','kotas'));
+        return view('perjalanan.edit', compact('perjalanan'));
     }
     
     public function update(Request $request, $id)
     {
         try {
             $request->validate([
-                'depart_kota_id' => 'required|exists:kota,id',
-                'return_kota_id' => 'required|exists:kota,id',
                 'tanggal_berangkat' => 'required|date',
-                'budget' => 'required|numeric|min:0',
+                'tanggal_kembali' => 'nullable|date',
+                'uang_pengembalian_tol' => 'nullable|numeric',
+                'uang_kembali' => 'nullable|numeric',
+                'jalur' => 'nullable|in:full-tol,setengah-tol,bawah',
                 'is_done' => 'nullable|boolean',
-                'tanggal_kembali' => 'nullable|date|required_if:is_done,1',
-                'expenditure' => 'nullable|numeric|min:0|required_if:is_done,1',
-                'income' => 'nullable|numeric|min:0|required_if:is_done,1',
             ]);
     
             $perjalanan = Perjalanan::findOrFail($id);
             $perjalanan->update([
-                'depart_kota_id' => $request->depart_kota_id,
-                'return_kota_id' => $request->return_kota_id,
                 'tanggal_berangkat' => $request->tanggal_berangkat,
-                'budget' => $request->budget,
-                'is_done' => $request->is_done ?? 0,
-                'tanggal_kembali' => $request->is_done ? $request->tanggal_kembali : null,
-                'expenditure' => $request->is_done ? $request->expenditure : 0,
-                'income' => $request->is_done ? $request->income : 0,
+                'tanggal_kembali' => $request->tanggal_kembali,
+                'jalur' => $request->jalur,
+                'uang_pengembalian_tol' => $request->uang_pengembalian_tol ?? 0,
+                'uang_kembali' => $request->uang_kembali ?? 0,
+                // 'uang_subsidi_tol' => config('constants.uang.uang_subsidi_tol') ?? 0,
+                // 'uang_setoran' => config('constants.uang.uang_setoran') ?? 0,
+                'is_done' => $request->is_done ?? false,
             ]);
     
             return redirect()->route('perjalanan.index')->with('success', 'Data perjalanan berhasil diperbarui!');

@@ -111,21 +111,22 @@
                     <table id="datatable-perjalanan" class="table table-bordered text-nowrap w-100">
                         <thead>
                             <tr>
+                                <th style="width: 5px">No</th>
                                 <th style="width: 80px;">Aksi</th>
+                                <th>ID Perjalanan</th>
                                 <th>Tanggal Perjalanan</th>
-                                <th>Nopol Truk</th>
-                                <th>Nama Supir</th>
-                                <th>Rute</th>
-                                <th>Budget</th>
-                                <th>Pemasukkan</th>
-                                <th>Pengeluaran</th>
-                                <th>Total</th>
+                                <th>Nama Truk</th>
+                                <th>Jalur</th>
+                                <th>Uang Kembali</th>
+                                <th>Sisa</th>
+                                <th>Bayaran Supir</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($perjalanan as $item)
+                            @foreach($perjalanan as $key => $item)
                                 <tr>
+                                    <td>{{ $key + 1 }}.</td>
                                     <td>
                                         <div class="btn-list">
                                             <a href="/perjalanan/detail/{{ $item->id }}"class="btn btn-teal-transparent showPerjalanan">
@@ -147,25 +148,29 @@
                                             </form>
                                         </div>
                                     </td>
+                                    <td>{{ $item->hash ?? '-' }}</td>
                                     <td>{{ $item->tanggal_berangkat_format ?? 'N/A' }} - {{ $item->tanggal_kembali_format ?? 'N/A' }}</td>
-                                    <td>{{ $item->truk_nopol ?? '-' }}</td>
-                                    <td>{{ $item->supir_nama ?? '-' }}</td>
+                                    <td>{{ $item->truk_nama ?? '-' }}</td>
                                     <td>
-                                        {{ 
-                                            str_replace(['KABUPATEN', 'KOTA'], '', $item->depart_kota_nama) . ' - ' . 
-                                            str_replace(['KABUPATEN', 'KOTA'], '', $item->return_kota_nama) . ' - ' . 
-                                            str_replace(['KABUPATEN', 'KOTA'], '', $item->depart_kota_nama) 
-                                        }}
+                                        @if ($item->jalur == 'full-tol')
+                                            Full Tol
+                                        @elseif ($item->jalur == 'setengah-tol')
+                                            Setengah Tol
+                                        @elseif ($item->jalur == 'bawah')
+                                            Bawah
+                                        @else
+                                            -
+                                        @endif
                                     </td>
-                                    <td>Rp. {{ number_format($item->budget ?? 0, 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($item->income ?? 0, 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($item->expenditure ?? 0, 0, ',', '.') }}</td>
-                                    <th class="{{ ($item->total ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
+                                    <td>Rp. {{ number_format($item->uang_kembali ?? 0, 0, ',', '.') }}</td>
+                                    <td>Rp. {{ number_format($item->sisa ?? 0, 0, ',', '.') }}</td>
+                                    <td>Rp. {{ number_format($item->bayaran_supir ?? 0, 0, ',', '.') }}</td>
+                                    {{-- <th class="{{ ($item->total ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
                                         Rp. {{ number_format($item->total ?? 0, 0, ',', '.') }}
-                                    </th>
+                                    </th> --}}
                                     <td>
                                         @if ($item->is_done)
-                                            <span class="badge bg-success">Selesai</span>
+                                            <span class="badge bg-success ">Selesai</span>
                                         @else
                                             <span class="badge bg-danger">Belum Selesai</span>
                                         @endif
@@ -175,13 +180,13 @@
                         </tbody>
                         <tfoot>
                             <tr class="fw-bold bg-light">
-                                <td colspan="5" class="text-end">Total Keseluruhan:</td>
-                                <td>Rp. {{ number_format($perjalanan->sum('budget') ?? 0, 0, ',', '.') }}</td>
-                                <td>Rp. {{ number_format($perjalanan->sum('income') ?? 0, 0, ',', '.') }}</td>
-                                <td>Rp. {{ number_format($perjalanan->sum('expenditure') ?? 0, 0, ',', '.') }}</td>
-                                <td class="{{ $perjalanan->sum('total') < 0 ? 'text-danger' : 'text-success' }}">
+                                <td colspan="6" class="text-end">Total Keseluruhan:</td>
+                                <td>Rp. {{ number_format($perjalanan->sum('uang_kembali') ?? 0, 0, ',', '.') }}</td>
+                                <td>Rp. {{ number_format($perjalanan->sum('sisa') ?? 0, 0, ',', '.') }}</td>
+                                <td>Rp. {{ number_format($perjalanan->sum('bayaran_supir') ?? 0, 0, ',', '.') }}</td>
+                                {{-- <td class="{{ $perjalanan->sum('total') < 0 ? 'text-danger' : 'text-success' }}">
                                     Rp. {{ number_format($perjalanan->sum('total') ?? 0, 0, ',', '.') }}
-                                </td>
+                                </td> --}}
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -213,6 +218,20 @@
                             @foreach($truks as $truk)
                                 <option value="{{ $truk->id }}" {{ old('truk_id', $trukId ?? '') == $truk->id ? 'selected' : '' }}>
                                     {{ $truk->no_polisi }} - {{ $truk->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('truk_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Supir</label>
+                        <select class="form-control form-control-sm @error('supir_id') is-invalid @enderror" name="supir_id" id="supir_id">
+                            <option value="" {{ old('supir_id', $trukId ?? '') === '' ? 'selected' : '' }}>-- Pilih Supir --</option>
+                            @foreach($supirs as $supir)
+                                <option value="{{ $supir->id }}" {{ old('supir_id', $supirId ?? '') == $supir->id ? 'selected' : '' }}>
+                                    {{ $supir->nama }}
                                 </option>
                             @endforeach
                         </select>
@@ -289,12 +308,16 @@
             var params = [];
             var dateRange = $('#daterange').val();
             var trukId = $('#truk_id').val();
+            var supirId = $('#supir_id').val();
             var isDone = $('#is_done').val();
             if (dateRange && dateRange !== '') {
                 params.push('date_range=' + encodeURIComponent(dateRange));
             }
             if (trukId && trukId !== '') {
                 params.push('truk_id=' + encodeURIComponent(trukId));
+            }
+            if (supirId && supirId !== '') {
+                params.push('supir_id=' + encodeURIComponent(supirId));
             }
             if (isDone && isDone !== '') {
                 params.push('is_done=' + encodeURIComponent(isDone));
@@ -310,6 +333,7 @@
         $('#resetFilter').on('click', function() {
             $('#daterange').val('');
             $('#truk_id').val('');
+            $('#supir_id').val('');
             $('#is_done').val('');
             $('#daterange').data('daterangepicker').setStartDate(moment());
             $('#daterange').data('daterangepicker').setEndDate(moment());
