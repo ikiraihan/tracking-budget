@@ -7,18 +7,17 @@
             <div class="card custom-card">
                 <div class="card-header justify-content-between">
                     <div class="card-title">
-                        Edit Data Supir
+                        Tambah Data Supir
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <form action="/supir/update/{{ $supir->id }}" method="POST" enctype="multipart/form-data">
-                            @csrf  
-                            @method('PUT')                       
+                        <form action="/supir/store" method="POST" enctype="multipart/form-data">
+                            @csrf                       
                             <div class="row">
                                 {{-- Foto Diri --}}
                                 <div class="col-md-12 mb-2">
-                                    <label for="photo_diri" class="form-label">Foto Diri <span style="color: red;">*</span></label>
+                                    <label for="photo_diri" class="form-label">Foto Diri</label>
                                     <input type="file" class="form-control @error('photo_diri') is-invalid @enderror" 
                                         id="photo_diri" name="photo_diri" accept=".jpg,.jpeg,.png">                                    
                                     @error('photo_diri')
@@ -26,21 +25,22 @@
                                     @enderror
                                     <div class="mt-2">
                                         <img id="preview-photo_diri" 
-                                            src="{{ $supir->path_photo_diri ? asset($supir->path_photo_diri) : '#' }}" 
+                                            src=" #" 
                                             alt="Preview Foto Diri" 
                                             class="img-thumbnail" 
                                             width="150"
-                                            style="{{ $supir->path_photo_diri ? '' : 'display: none;' }}"
-                                            data-old-src="{{ $supir->path_photo_diri ? asset($supir->path_photo_diri) : '' }}">
+                                            style="display: none;"
+                                            {{-- data-old-src="{{ $supir->path_photo_diri ? asset($supir->path_photo_diri) : '' }}" --}}
+                                            >
                                     </div>
                                 </div>
                                 
                                 {{-- Nama Supir --}}
                                 <div class="col-md-6 mb-2">
-                                    <label for="nama" class="form-label">Nama Supir <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control @error('nama') is-invalid @enderror" 
-                                           id="nama" name="nama" value="{{ old('nama', $supir->nama) }}" required>
-                                    @error('nama')
+                                    <label for="name" class="form-label">Nama Supir <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                           id="name" name="name" required>
+                                    @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -49,7 +49,7 @@
                                 <div class="col-md-6 mb-2">
                                     <label for="telepon" class="form-label">Telepon <span style="color: red;">*</span></label>
                                     <input type="text" class="form-control @error('telepon') is-invalid @enderror" 
-                                           id="telepon" name="telepon" value="{{ old('telepon', $supir->telepon) }}" required>
+                                           id="telepon" name="telepon" required>
                                     @error('telepon')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -59,13 +59,12 @@
                                 <div class="col-md-6 mb-2">
                                     <label for="alamat" class="form-label">Alamat <span style="color: red;">*</span></label>
                                     <textarea class="form-control @error('alamat') is-invalid @enderror" 
-                                              id="alamat" name="alamat" rows="1" required>{{ old('alamat', $supir->alamat) }}</textarea>
+                                              id="alamat" name="alamat" rows="1" required></textarea>
                                     @error('alamat')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                         
-                                {{-- No. KTP --}}
                                 {{-- <div class="col-md-6 mb-2">
                                     <label for="no_ktp" class="form-label">No. KTP</label>
                                     <input type="text" class="form-control @error('no_ktp') is-invalid @enderror" 
@@ -73,10 +72,9 @@
                                     @error('no_ktp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                </div> --}}
+                                </div>
                         
-                                {{-- Foto KTP --}}
-                                {{-- <div class="col-md-6 mb-2">
+                                <div class="col-md-6 mb-2">
                                     <label for="photo_ktp" class="form-label">Foto KTP</label>
                                     <input type="file" class="form-control @error('photo_ktp') is-invalid @enderror" 
                                         id="photo_ktp" name="photo_ktp" accept=".jpg,.jpeg,.png">                                    
@@ -92,20 +90,18 @@
                                             style="{{ $supir->path_photo_ktp ? '' : 'display: none;' }}"
                                             data-old-src="{{ $supir->path_photo_ktp ? asset($supir->path_photo_ktp) : '' }}">
                                     </div>
-                                </div> --}}
+                                </div>
                         
-                                {{-- No. SIM --}}
-                                {{-- <div class="col-md-6 mb-2">
+                                <div class="col-md-6 mb-2">
                                     <label for="no_sim" class="form-label">No. SIM</label>
                                     <input type="text" class="form-control @error('no_sim') is-invalid @enderror" 
                                            id="no_sim" name="no_sim" value="{{ old('no_sim', $supir->no_sim) }}">
                                     @error('no_sim')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                </div> --}}
+                                </div>
                         
-                                {{-- Foto SIM --}}
-                                {{-- <div class="col-md-6 mb-2">
+                                <div class="col-md-6 mb-2">
                                     <label for="photo_sim" class="form-label">Foto SIM</label>
                                     <input type="file" class="form-control @error('photo_sim') is-invalid @enderror" 
                                         id="photo_sim" name="photo_sim" accept=".jpg,.jpeg,.png">
@@ -129,8 +125,8 @@
                                     <select class="form-control @error('truk_id') is-invalid @enderror" name="truk_id" id="truk_id" required>
                                         <option value="">-- Pilih Truk --</option>
                                         @foreach($truks as $truk)
-                                            <option value="{{ $truk->id }}" {{ old('truk_id', $supir->truk_id) == $truk->id ? 'selected' : '' }}>
-                                                {{ $truk->no_polisi }} - {{ $truk->nama }}
+                                            <option value="{{ $truk->id }}">
+                                                {{ $truk->nama }} - {{ $truk->no_polisi }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -143,8 +139,8 @@
                                     <label for="is_active" class="form-label">Status Supir</label>
                                     <select class="form-control @error('is_active') is-invalid @enderror" name="is_active" id="is_active" required>
                                         <option value="" disabled>-- Pilih Status --</option>
-                                        <option value="1" {{ old('is_active', $supir->is_active) == 1 ? 'selected' : '' }}>Aktif</option>
-                                        <option value="0" {{ old('is_active', $supir->is_active) == 0 ? 'selected' : '' }}>Tidak Aktif</option>
+                                        <option value="1">Aktif</option>
+                                        <option value="0">Tidak Aktif</option>
                                     </select>
                                     @error('is_active')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -155,10 +151,26 @@
                                 <div class="col-md-6 mb-2">
                                     <label for="username" class="form-label">Username <span style="color: red;">*</span></label>
                                     <input type="text" class="form-control @error('username') is-invalid @enderror" 
-                                           id="username" name="username" value="{{ old('username', $user->username) }}" required>
+                                           id="username" name="username" required>
                                     @error('username')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                </div>
+
+                                <!-- Password Input -->
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Password <span style="color: red;">*</span></label>
+                                    <input class="form-control @error('password') is-invalid @enderror"
+                                        placeholder="Masukkan password" type="password" name="password" required>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                                    
+                                <!-- Confirm Password Input -->
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Konfirmasi Password <span style="color: red;">*</span></label>
+                                    <input class="form-control" placeholder="Ulangi password" type="password" name="password_confirmation" required>
                                 </div>
                             </div>
                         

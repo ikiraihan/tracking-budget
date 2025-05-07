@@ -1679,6 +1679,95 @@
         });
     </script>
 
+    @php
+        $defaultStart = now()->format('Y-m-d');
+        $defaultEnd = now()->format('Y-m-d');
+
+        if (isset($dateRange) && strpos($dateRange, ' - ') !== false) {
+            [$start, $end] = explode(' - ', $dateRange);
+        } else {
+            $start = $defaultStart;
+            $end = $defaultEnd;
+        }
+    @endphp
+    <script>
+        $(document).ready(function() {
+            if ($('#daterange').length) {
+                $('#daterange').daterangepicker({
+                    locale: {
+                        format: 'YYYY-MM-DD',
+                        separator: ' - ',
+                        applyLabel: 'Pilih',
+                        cancelLabel: 'Batal',
+                        daysOfWeek: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                        monthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                        firstDay: 1
+                    },
+                    opens: 'right',
+                    showDropdowns: true,
+                    autoUpdateInput: false,
+                    startDate: moment('{{ $start }}'),
+                    endDate: moment('{{ $end }}')
+                });
+
+                $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+                    $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+                });
+
+                $('#daterange').on('cancel.daterangepicker', function() {
+                    $(this).val('');
+                });
+
+                $('#daterange').on('show.daterangepicker', function(ev, picker) {
+                    picker.container.find('.calendar.right').hide();
+                    picker.container.find('.calendar.left').css('float', 'none');
+                    picker.container.find('.daterangepicker').css('width', 'auto');
+                });
+            }
+
+            $('#applyFilter').on('click', function(e) {
+                e.preventDefault();
+                var form = $('#filterForm');
+                var params = [];
+                var dateRange = $('#daterange').val();
+                var trukId = $('#truk_id').val();
+                var supirId = $('#supir_id').val();
+                var isDone = $('#is_done').val();
+
+                if (dateRange && dateRange !== '') {
+                    params.push('date_range=' + encodeURIComponent(dateRange));
+                }
+                if (trukId && trukId !== '') {
+                    params.push('truk_id=' + encodeURIComponent(trukId));
+                }
+                if (supirId && supirId !== '') {
+                    params.push('supir_id=' + encodeURIComponent(supirId));
+                }
+                if (isDone && isDone !== '') {
+                    params.push('is_done=' + encodeURIComponent(isDone));
+                }
+
+                var url = form.attr('action');
+                if (params.length > 0) {
+                    url += '?' + params.join('&');
+                }
+                window.location.href = url;
+            });
+
+            $('#resetFilter').on('click', function() {
+                $('#daterange').val('');
+                $('#truk_id').val('');
+                $('#supir_id').val('');
+                $('#is_done').val('');
+                if ($('#daterange').data('daterangepicker')) {
+                    $('#daterange').data('daterangepicker').setStartDate(moment());
+                    $('#daterange').data('daterangepicker').setEndDate(moment());
+                }
+            });
+        });
+    </script>
+
+
     @yield('script')
     @stack('scripts')
 </body>

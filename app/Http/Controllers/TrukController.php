@@ -7,24 +7,43 @@ use App\Models\Truk;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class TrukController extends Controller
 {
     public function index()
     {
-        $truks = Truk::get();
+        $user = Auth::user();
+        $role = $user && $user->role_id ? $user->role->slug : null;
+        $truks = Truk::where('is_active',true)->get();
+        $trukInactives = Truk::where('is_active',false)->get();
 
-        return view('truk.index', compact('truks'));
+        return view('truk.index', compact('truks','trukInactives','role'));
     }
 
     public function detail($id,Request $request)
     {
+        $defaultRangeTanggal = Carbon::now()->startOfMonth()->toDateString() . ' - ' . Carbon::now()->endOfMonth()->toDateString();
+        $dateRange = $request->date_range ?? $defaultRangeTanggal;
+        $isDone = $request->is_done;
+        $supirId = $request->supir_id;
+
         $truk = Truk::findOrFail($id);
-        $perjalanans = Perjalanan::where('truk_id',$id)->get();
+        $perjalanans = Perjalanan::where('truk_id',$id)
+        ->when($dateRange && strpos($dateRange, ' - ') !== false, function ($query) use ($dateRange) {
+            [$startDate, $endDate] = explode(' - ', $dateRange);
+            return $query->whereBetween('tanggal_berangkat', [$startDate, $endDate]);
+        })
+        ->when($isDone != null, function ($query) use ($isDone) {
+            return $query->where('is_done', $isDone);
+        })
+        ->when($supirId != null, function ($query) use ($supirId) {
+            return $query->where('supir_id', $supirId);
+        })->get();
+
         $supirs = $truk->supirs->where('is_active', true);
-        $supirNames = $supirs->pluck('nama')->values();
-        
+        $supirNames = $supirs->pluck('nama')->values();       
         $supirString = match ($supirNames->count()) {
             0 => '',
             1 => $supirNames[0],
@@ -35,29 +54,28 @@ class TrukController extends Controller
         $perjalananRemap = $perjalanans->map(function ($perjalanan) {
             return (object)[
                 'id'              => $perjalanan->id,
+                'hash'              => $perjalanan->hash,
                 'truk_id'         => $perjalanan->truk_id,
+                'truk_nama'      => $perjalanan->truk && $perjalanan->truk->nama ? $perjalanan->truk->nama : null,
                 'truk_nopol'      => $perjalanan->truk && $perjalanan->truk->no_polisi ? $perjalanan->truk->no_polisi : null,
                 'supir_id'        => $perjalanan->supir_id,
                 'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
-                'depart_provinsi_id'   => $perjalanan->depart_provinsi_id,
-                'depart_provinsi_nama' => $perjalanan->departProvinsi && $perjalanan->departProvinsi->nama ? $perjalanan->departProvinsi->nama : null,
-                'depart_kota_id'   => $perjalanan->depart_kota_id,
-                'depart_kota_nama' => $perjalanan->departKota && $perjalanan->departKota->nama ? $perjalanan->departKota->nama : null,
-                'return_provinsi_id'   => $perjalanan->return_provinsi_id,
-                'return_provinsi_nama' => $perjalanan->returnProvinsi && $perjalanan->returnProvinsi->nama ? $perjalanan->returnProvinsi->nama : null,
-                'return_kota_id'   => $perjalanan->return_kota_id,
-                'return_kota_nama' => $perjalanan->returnKota && $perjalanan->returnKota->nama ? $perjalanan->returnKota->nama : null,
+                'supir_telepon'      => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
+                'jalur'      => $perjalanan->jalur ? $perjalanan->jalur : null,
+
                 'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
-                'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d M Y'): null,
+                'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d F Y'): null,
                 'tanggal_kembali'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali): null,
-                'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d M Y'): null,
+                'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d F Y'): null,
 
-                'budget'           => $perjalanan->budget ? $perjalanan->budget : null,
-                'income'           => $perjalanan->income ? $perjalanan->income : null,
-                'expenditure'      => $perjalanan->expenditure ? $perjalanan->expenditure : null,
+                'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
+                'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
+                'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
+                'sisa'             => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali,
+                'uang_setoran'           => $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
+                'bayaran_supir'    => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran,
 
-                'total'            => $perjalanan->budget + $perjalanan->income - $perjalanan->expenditure,
-                
+                'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
                 'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,
             ];
         });
@@ -66,6 +84,10 @@ class TrukController extends Controller
             'truk' => $truk,
             'perjalanans' => $perjalananRemap,
             'supir_nama' => $supirString,
+            'supirs' => $supirs,
+            'supirId' => $supirId,
+            'dateRange' => $dateRange,
+            'isDone' => $isDone,
         ]);
     }
 
@@ -81,6 +103,7 @@ class TrukController extends Controller
                 'no_polisi' => 'required|string|max:255',
                 'nama' => 'required|string|max:255',
                 'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                'is_active' => 'nullable|boolean',
             ]);
 
             $cekNoPol = Truk::where('no_polisi',$request->no_polisi)->first();
@@ -91,6 +114,7 @@ class TrukController extends Controller
             $truk = new Truk();
             $truk->no_polisi = $request->no_polisi;
             $truk->nama = $request->nama;
+            $truk->is_active = $request->is_active;
 
             if ($request->hasFile('photo')) {
     
@@ -125,6 +149,7 @@ class TrukController extends Controller
             'no_polisi' => 'required|string|max:255',
             'nama' => 'required|string|max:255',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'is_active' => 'nullable|boolean',
         ]);
     
         try {
@@ -132,6 +157,7 @@ class TrukController extends Controller
     
             $truk->no_polisi = $request->no_polisi;
             $truk->nama = $request->nama;
+            $truk->is_active = $request->is_active;
     
             if ($request->hasFile('photo')) {
                 // Hapus foto lama jika ada

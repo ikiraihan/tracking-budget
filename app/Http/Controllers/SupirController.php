@@ -8,12 +8,15 @@ use App\Models\Truk;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class SupirController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+        $role = $user && $user->role_id ? $user->role->slug : null;
         $supirsActive = Supir::orderBy('created_at', 'desc')->where('is_active',true)->get();
         $supirsInactive = Supir::orderBy('created_at', 'desc')->where('is_active',false)->get();
 
@@ -59,40 +62,132 @@ class SupirController extends Controller
 
         // dd($supirs);
 
-        return view('supir.index', compact('supirs','supirsInactive'));
+        return view('supir.index', compact('supirs','supirsInactive','role'));
+    }
+
+    public function create()
+    {
+        $truks = Truk::get();
+
+        return view('supir.create', compact('truks'));
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            // Validate both User and Supir fields
+            $request->validate([
+                // User fields
+                'name' => 'required|string|max:255',
+                'username' => 'required|string|max:50|unique:users,username',
+                'password' => 'required|string|min:6|confirmed',
+                // Supir fields
+                'truk_id' => 'nullable|exists:truk,id',
+                'telepon' => 'nullable|string|max:50',
+                'alamat' => 'nullable|string|max:255',
+                'no_ktp' => 'nullable|string|max:100',
+                'no_sim' => 'nullable|string|max:100',
+                'photo_diri' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+                'photo_ktp' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+                'photo_sim' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+            ]);
+    
+            // Create User
+            $user = User::create([
+                'name' => $request->name,
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'is_active' => 1,
+            ]);
+    
+            // Create Supir
+            $supir = new Supir();
+            $supir->truk_id = $request->truk_id;
+            $supir->user_id = $user->id;
+            $supir->nama = $request->name;
+            $supir->telepon = $request->telepon;
+            $supir->alamat = $request->alamat;
+            $supir->no_ktp = $request->no_ktp;
+            $supir->no_sim = $request->no_sim;
+    
+            if ($request->hasFile('photo_diri') && $request->file('photo_diri')->isValid()) {
+                $file = $request->file('photo_diri');
+                $filename = time() . '_diri_' . $file->getClientOriginalName();
+                $destination = public_path('uploads/supir/diri');
+                if (!file_exists($destination)) mkdir($destination, 0755, true);
+                $file->move($destination, $filename);
+                $supir->path_photo_diri = '/uploads/supir/diri/' . $filename;
+            }
+    
+            if ($request->hasFile('photo_ktp') && $request->file('photo_ktp')->isValid()) {
+                $file = $request->file('photo_ktp');
+                $filename = time() . '_ktp_' . $file->getClientOriginalName();
+                $destination = public_path('uploads/supir/ktp');
+                if (!file_exists($destination)) mkdir($destination, 0755, true);
+                $file->move($destination, $filename);
+                $supir->path_photo_ktp = '/uploads/supir/ktp/' . $filename;
+            }
+    
+            if ($request->hasFile('photo_sim') && $request->file('photo_sim')->isValid()) {
+                $file = $request->file('photo_sim');
+                $filename = time() . '_sim_' . $file->getClientOriginalName();
+                $destination = public_path('uploads/supir/sim');
+                if (!file_exists($destination)) mkdir($destination, 0755, true);
+                $file->move($destination, $filename);
+                $supir->path_photo_sim = '/uploads/supir/sim/' . $filename;
+            }
+    
+            $supir->save();
+    
+            return redirect()->route('/supir')->with('success', 'Supir Berhasil dibuat!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with(['error' => 'Terjadi kesalahan saat registrasi. Pesan Kesalahan: ' . $e->getMessage()]);
+        }
     }
 
     public function detail($id,Request $request)
     {
+        $defaultRangeTanggal = Carbon::now()->startOfMonth()->toDateString() . ' - ' . Carbon::now()->endOfMonth()->toDateString();
+        $dateRange = $request->date_range ?? $defaultRangeTanggal;
+        $isDone = $request->is_done;
+
         $supir = Supir::findOrFail($id);
-        $perjalanans = Perjalanan::where('supir_id',$id)->get();
+        $perjalanans = Perjalanan::where('supir_id',$id)
+        ->when($dateRange && strpos($dateRange, ' - ') !== false, function ($query) use ($dateRange) {
+            [$startDate, $endDate] = explode(' - ', $dateRange);
+            return $query->whereBetween('tanggal_berangkat', [$startDate, $endDate]);
+        })
+        ->when($isDone != null, function ($query) use ($isDone) {
+            return $query->where('is_done', $isDone);
+        })->get();
         
         $perjalananRemap = $perjalanans->map(function ($perjalanan) {
             return (object)[
                 'id'              => $perjalanan->id,
+                'hash'              => $perjalanan->hash,
                 'truk_id'         => $perjalanan->truk_id,
+                'truk_nama'      => $perjalanan->truk && $perjalanan->truk->nama ? $perjalanan->truk->nama : null,
                 'truk_nopol'      => $perjalanan->truk && $perjalanan->truk->no_polisi ? $perjalanan->truk->no_polisi : null,
                 'supir_id'        => $perjalanan->supir_id,
                 'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
-                'depart_provinsi_id'   => $perjalanan->depart_provinsi_id,
-                'depart_provinsi_nama' => $perjalanan->departProvinsi && $perjalanan->departProvinsi->nama ? $perjalanan->departProvinsi->nama : null,
-                'depart_kota_id'   => $perjalanan->depart_kota_id,
-                'depart_kota_nama' => $perjalanan->departKota && $perjalanan->departKota->nama ? $perjalanan->departKota->nama : null,
-                'return_provinsi_id'   => $perjalanan->return_provinsi_id,
-                'return_provinsi_nama' => $perjalanan->returnProvinsi && $perjalanan->returnProvinsi->nama ? $perjalanan->returnProvinsi->nama : null,
-                'return_kota_id'   => $perjalanan->return_kota_id,
-                'return_kota_nama' => $perjalanan->returnKota && $perjalanan->returnKota->nama ? $perjalanan->returnKota->nama : null,
+                'supir_telepon'      => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
+                'jalur'      => $perjalanan->jalur ? $perjalanan->jalur : null,
+
                 'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
-                'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d M Y'): null,
+                'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d F Y'): null,
                 'tanggal_kembali'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali): null,
-                'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d M Y'): null,
+                'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d F Y'): null,
 
-                'budget'           => $perjalanan->budget ? $perjalanan->budget : null,
-                'income'           => $perjalanan->income ? $perjalanan->income : null,
-                'expenditure'      => $perjalanan->expenditure ? $perjalanan->expenditure : null,
+                'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
+                'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
+                'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
+                'sisa'             => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali,
+                'uang_setoran'           => $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
+                'bayaran_supir'    => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran,
 
-                'total'            => $perjalanan->budget + $perjalanan->income - $perjalanan->expenditure,
-                
+                'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
                 'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,
             ];
         });
@@ -100,6 +195,8 @@ class SupirController extends Controller
         return view('supir.detail', [
             'supir' => $supir,
             'perjalanans' => $perjalananRemap,
+            'dateRange' => $dateRange,
+            'isDone' => $isDone,
         ]);
     }
 

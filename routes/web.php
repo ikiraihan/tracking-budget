@@ -24,6 +24,11 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'role:1'])->group(function () {//admin
     Route::get('supir/change-password/{user_id}', [SupirController::class, 'changePassForm'])->name('supir.change_password_form');
+    Route::get('supir/create', [SupirController::class, 'create'])->name('supir.create');
+    Route::post('supir/store', [SupirController::class, 'store'])->name('supir.store');
+    Route::get('supir/edit/{id}', [SupirController::class, 'edit'])->name('supir.edit');
+    Route::put('supir/update/{id}', [SupirController::class, 'update'])->name('supir.update');
+    Route::delete('supir/delete/{id}', [SupirController::class, 'delete'])->name('supir.delete');
     Route::put('supir/password/{user_id}', [SupirController::class, 'changePass'])->name('supir.change_password');
     Route::get('supir/verifikasi-form/{id}', [SupirController::class, 'verifikasiForm'])->name('supir.verifikasi_form');
     Route::put('supir/verifikasi/{id}', [SupirController::class, 'verifikasi'])->name('supir.verifikasi');
@@ -41,11 +46,6 @@ Route::middleware(['auth', 'role:1,2'])->group(function () { //admin dan owner
 
     Route::get('supir', [SupirController::class, 'index'])->name('supir.index');
     Route::get('supir/detail/{id}', [SupirController::class, 'detail'])->name('supir.detail');
-    Route::get('supir/create', [SupirController::class, 'create'])->name('supir.create');
-    Route::post('supir/store', [SupirController::class, 'store'])->name('supir.store');
-    Route::get('supir/edit/{id}', [SupirController::class, 'edit'])->name('supir.edit');
-    Route::put('supir/update/{id}', [SupirController::class, 'update'])->name('supir.update');
-    Route::delete('supir/delete/{id}', [SupirController::class, 'delete'])->name('supir.delete');
 });
 
 Route::middleware(['auth', 'role:1,2,3'])->group(function () { //admin , owner, dan supir

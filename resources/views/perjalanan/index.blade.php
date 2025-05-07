@@ -228,7 +228,7 @@
                     <div class="mb-3">
                         <label class="form-label">Supir</label>
                         <select class="form-control form-control-sm @error('supir_id') is-invalid @enderror" name="supir_id" id="supir_id">
-                            <option value="" {{ old('supir_id', $trukId ?? '') === '' ? 'selected' : '' }}>-- Pilih Supir --</option>
+                            <option value="" {{ old('supir_id', $supirId ?? '') === '' ? 'selected' : '' }}>-- Pilih Supir --</option>
                             @foreach($supirs as $supir)
                                 <option value="{{ $supir->id }}" {{ old('supir_id', $supirId ?? '') == $supir->id ? 'selected' : '' }}>
                                     {{ $supir->nama }}
@@ -260,7 +260,7 @@
     </div>
 </div>
 @endsection
-@push('scripts')
+{{-- @push('scripts')
 <script>
     $(document).ready(function() {
         // Initialize daterangepicker
@@ -340,7 +340,7 @@
         });
     });
 </script>
-@endpush
+@endpush --}}
 <script>
     $(document).ready(function() {
         // Inisialisasi DataTables baru

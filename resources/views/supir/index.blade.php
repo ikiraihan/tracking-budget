@@ -2,11 +2,11 @@
 
 @section('content')
 <div class="container-fluid">
-    {{-- <div class="mb-2">
-        <a href="/truk/create" type="button" class="btn btn-primary-transparent">
-            Tambah Truk
+    <div class="mb-2">
+        <a href="/supir/create" type="button" class="btn btn-primary-transparent">
+            Tambah Supir
         </a>
-    </div> --}}
+    </div>
     <div class="card custom-card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div class="card-title">Data Supir</div>
@@ -50,9 +50,11 @@
                                             @if($item->is_verifikasi == true)
                                             <div class="btn-list">
                                                 <a href="/supir/detail/{{ $item->id }}" class="btn btn-teal-transparent"><i class="fa-solid fa-eye"></i></a>
+                                                @if($role == 'admin')
                                                 <a href="/supir/edit/{{ $item->id }}" class="btn btn-warning-transparent"><i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="/supir/change-password/{{ $item->user_id }}" class="btn btn-primary-transparent"><i class="fas fa-key"></i></a>                                                                
+                                                <a href="/supir/change-password/{{ $item->user_id }}" class="btn btn-primary-transparent"><i class="fas fa-key"></i></a>    
+                                                @endif                                                            
                                                 {{-- <form action="/supir/delete/{{ $item->user_id }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -135,7 +137,7 @@
                                     <th style="width: 200px;">Foto SIM</th> 
                                     <th>Jenis Truk</th>
                                     <th>No. Polisi</th> --}}
-                                    <th>Status Aktif</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -145,6 +147,7 @@
                                         <td>
                                             <div class="btn-list">
                                                 <a href="/supir/detail/{{ $item->id }}" class="btn btn-teal-transparent"><i class="fa-solid fa-eye"></i></a>
+                                                @if($role == 'admin')
                                                 <a href="/supir/edit/{{ $item->id }}" class="btn btn-warning-transparent"><i class="fas fa-edit"></i>
                                                 </a>
                                                 <form action="" method="POST" class="d-inline">
@@ -157,7 +160,8 @@
                                                     >
                                                         <i class="fas fa-trash"></i>
                                                     </button>
-                                                </form>                                                                     
+                                                </form>    
+                                                @endif                                                                 
                                             </div> 
                                         </td>
                                         <td>

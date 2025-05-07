@@ -27,6 +27,18 @@
                                     <input type="text" class="form-control" id="nama" name="nama"
                                         value="{{ old('nama', $truk->nama) }}" required>
                                 </div>
+
+                                <div class="col-md-12 mb-3">
+                                    <label for="is_active" class="form-label">Status Truk</label>
+                                    <select class="form-control @error('is_active') is-invalid @enderror" name="is_active" id="is_active" required>
+                                        <option value="" disabled>-- Pilih Status --</option>
+                                        <option value="1" {{ old('is_active', $truk->is_active) == 1 ? 'selected' : '' }}>Aktif</option>
+                                        <option value="0" {{ old('is_active', $truk->is_active) == 0 ? 'selected' : '' }}>Tidak Aktif</option>
+                                    </select>
+                                    @error('is_active')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                         
                                 <div class="col-md-12 mb-3">
                                     <label for="photo" class="form-label">Foto Truk</label>

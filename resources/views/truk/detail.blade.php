@@ -4,29 +4,46 @@
 <!-- Modal -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form method="GET" action="">
+      <form method="GET"  id="filterForm" action="/truk/detail/{{ $truk->id }}">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="filterModalLabel">Filter Perjalanan</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <!-- Tambahkan field filter sesuai kebutuhan -->
             <div class="mb-3">
-              <label class="form-label">Nama Supir</label>
-              <input type="text" name="supir" class="form-control" value="{{ request('supir') }}">
+                <label class="form-label">Tanggal</label>
+                <input type="text" id="daterange" name="date_range" class="form-control form-control-sm" value="{{ old('date_range', $dateRange ?? '') }}">
             </div>
             <div class="mb-3">
-              <label class="form-label">Status</label>
-              <select name="is_done" class="form-select">
-                <option value="">-- Semua --</option>
-                <option value="1" {{ request('is_done') == '1' ? 'selected' : '' }}>Selesai</option>
-                <option value="0" {{ request('is_done') == '0' ? 'selected' : '' }}>Belum Selesai</option>
-              </select>
+                <label class="form-label">Supir</label>
+                <select class="form-control form-control-sm @error('supir_id') is-invalid @enderror" name="supir_id" id="supir_id">
+                    <option value="" {{ old('supir_id', $supirId ?? '') === '' ? 'selected' : '' }}>-- Pilih Supir --</option>
+                    @foreach($supirs as $supir)
+                        <option value="{{ $supir->id }}" {{ old('supir_id', $supirId ?? '') == $supir->id ? 'selected' : '' }}>
+                            {{ $supir->nama }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('truk_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-control form-control-sm @error('is_done') is-invalid @enderror" name="is_done" id="is_done">
+                    <option value="" {{ old('is_done', $isDone) === null ? 'selected' : '' }}>-- Semua Status --</option>
+                    <option value="1" {{ old('is_done', $isDone) === '1' ? 'selected' : '' }}>Selesai</option>
+                    <option value="0" {{ old('is_done', $isDone) === '0' ? 'selected' : '' }}>Belum Selesai</option>
+                </select>
+                @error('is_done')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Terapkan</button>
+            <button type="button" class="btn btn-secondary" id="resetFilter">Reset Filter</button>
+            <button type="submit" class="btn btn-primary" id="applyFilter">Terapkan</button>
           </div>
         </div>
       </form>
@@ -56,8 +73,8 @@
                              style="width: auto; height: 120px; object-fit: cover;">
                     </div>
                     <div>
-                        <p class="card-text mb-1 fs-5 fw-bold">No. Polisi: {{ $truk->no_polisi }}</p>
-                        <div class="card-title fs-6">Jenis Truk: {{ $truk->nama }}</div>
+                        <div class="card-title fs-6">Nama Truk: {{ $truk->nama }}</div>
+                        <div class="card-title fs-6">No. Polisi: {{ $truk->no_polisi }}</div>
                         <div class="card-title fs-6">Daftar Supir: {{ !empty($supir_nama) ? $supir_nama : '-' }}</div>
                     </div>    
                 </div>
@@ -73,54 +90,63 @@
                     <table id="datatable-basic" class="table table-bordered text-nowrap w-100">
                         <thead>
                             <tr>
+                                <th style="width: 5px">No</th>
+                                <th>ID Perjalanan</th>
+                                <th>Tanggal Perjalanan</th>
                                 <th>Nama Supir</th>
-                                <th>Rute</th>
-                                <th>Budget</th>
-                                <th>Pemasukkan</th>
-                                <th>Pengeluaran</th>
-                                <th>Total</th>
+                                <th>Jalur</th>
+                                <th>Uang Kembali</th>
+                                {{-- <th>Sisa</th> --}}
+                                <th>Setoran</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($perjalanans as $item)
+                            @foreach($perjalanans as $key => $item)
                                 <tr>
+                                    <td>{{ $key + 1 }}.</td>
+                                    <td>{{ $item->hash ?? '-' }}</td>
+                                    <td>{{ $item->tanggal_berangkat_format ?? 'N/A' }} - {{ $item->tanggal_kembali_format ?? 'N/A' }}</td>
                                     <td>{{ $item->supir_nama ?? '-' }}</td>
                                     <td>
-                                        {{ 
-                                            str_replace(['KABUPATEN', 'KOTA'], '', $item->return_kota_nama) . ' - ' . 
-                                            str_replace(['KABUPATEN', 'KOTA'], '', $item->depart_kota_nama) . ' - ' . 
-                                            str_replace(['KABUPATEN', 'KOTA'], '', $item->return_kota_nama) 
-                                        }}
+                                        @if ($item->jalur == 'full-tol')
+                                            Full Tol
+                                        @elseif ($item->jalur == 'setengah-tol')
+                                            Setengah Tol
+                                        @elseif ($item->jalur == 'bawah')
+                                            Bawah
+                                        @else
+                                            -
+                                        @endif
                                     </td>
-                                    <td>Rp. {{ number_format($item->budget ?? 0, 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($item->income ?? 0, 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($item->expenditure ?? 0, 0, ',', '.') }}</td>
-                                    <th class="{{ ($item->total ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
+                                    <td>Rp. {{ number_format($item->uang_kembali ?? 0, 0, ',', '.') }}</td>
+                                    {{-- <td>Rp. {{ number_format($item->sisa ?? 0, 0, ',', '.') }}</td> --}}
+                                    <td>Rp. {{ number_format($item->uang_setoran ?? 0, 0, ',', '.') }}</td>
+                                    {{-- <th class="{{ ($item->total ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
                                         Rp. {{ number_format($item->total ?? 0, 0, ',', '.') }}
-                                    </th>
+                                    </th> --}}
                                     <td>
                                         @if ($item->is_done)
-                                            <span class="badge bg-success">Selesai</span>
+                                            <span class="badge bg-success ">Selesai</span>
                                         @else
                                             <span class="badge bg-danger">Belum Selesai</span>
                                         @endif
                                     </td>
                                 </tr>
                             @endforeach
-                        
-                            {{-- Total row --}}
+                        </tbody>
+                        <tfoot>
                             <tr class="fw-bold bg-light">
-                                <td colspan="2" class="text-end">Total Keseluruhan:</td>
-                                <td>Rp. {{ number_format($perjalanans->sum('budget') ?? 0, 0, ',', '.') }}</td>
-                                <td>Rp. {{ number_format($perjalanans->sum('income') ?? 0, 0, ',', '.') }}</td>
-                                <td>Rp. {{ number_format($perjalanans->sum('expenditure') ?? 0, 0, ',', '.') }}</td>
-                                <td class="{{ $perjalanans->sum('total') < 0 ? 'text-danger' : 'text-success' }}">
-                                    Rp. {{ number_format($perjalanans->sum('total') ?? 0, 0, ',', '.') }}
-                                </td>
+                                <td colspan="5" class="text-end">Total Keseluruhan:</td>
+                                <td>Rp. {{ number_format($perjalanans->sum('uang_kembali') ?? 0, 0, ',', '.') }}</td>
+                                {{-- <td>Rp. {{ number_format($perjalanans->sum('sisa') ?? 0, 0, ',', '.') }}</td> --}}
+                                <td>Rp. {{ number_format($perjalanans->sum('uang_setoran') ?? 0, 0, ',', '.') }}</td>
+                                {{-- <td class="{{ $perjalanan->sum('total') < 0 ? 'text-danger' : 'text-success' }}">
+                                    Rp. {{ number_format($perjalanan->sum('total') ?? 0, 0, ',', '.') }}
+                                </td> --}}
                                 <td></td>
                             </tr>
-                        </tbody>                        
+                        </tfoot>                           
                     </table>
                 </div>
             </div>                     
@@ -129,8 +155,84 @@
 </div>
 <!-- End::row-1 -->
 @endsection
-@section('scripts')
+{{-- @section('scripts')
 <script>
+    $(document).ready(function() {
+        // Initialize daterangepicker
+        $('#daterange').daterangepicker({
+            locale: {
+                format: 'YYYY-MM-DD',
+                separator: ' - ',
+                applyLabel: 'Pilih',
+                cancelLabel: 'Batal',
+                daysOfWeek: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                monthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                firstDay: 1
+            },
+            opens: 'right',
+            showDropdowns: true,
+            autoUpdateInput: false,
+            @if($dateRange && strpos($dateRange, ' - ') !== false)
+                startDate: moment('{{ explode(' - ', $dateRange)[0] }}'),
+                endDate: moment('{{ explode(' - ', $dateRange)[1] }}'),
+            @else
+                startDate: moment(),
+                endDate: moment(),
+            @endif
+        });
 
+        $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+        });
+
+        $('#daterange').on('cancel.daterangepicker', function() {
+            $(this).val('');
+        });
+
+        // Single calendar for mobile
+        $('#daterange').on('show.daterangepicker', function(ev, picker) {
+            picker.container.find('.calendar.right').hide();
+            picker.container.find('.calendar.left').css('float', 'none');
+            picker.container.find('.daterangepicker').css('width', 'auto');
+        });
+
+        // Handle form submission
+        $('#applyFilter').on('click', function(e) {
+            e.preventDefault();
+            var form = $('#filterForm');
+            var params = [];
+            var dateRange = $('#daterange').val();
+            var trukId = $('#truk_id').val();
+            var supirId = $('#supir_id').val();
+            var isDone = $('#is_done').val();
+            if (dateRange && dateRange !== '') {
+                params.push('date_range=' + encodeURIComponent(dateRange));
+            }
+            if (trukId && trukId !== '') {
+                params.push('truk_id=' + encodeURIComponent(trukId));
+            }
+            if (supirId && supirId !== '') {
+                params.push('supir_id=' + encodeURIComponent(supirId));
+            }
+            if (isDone && isDone !== '') {
+                params.push('is_done=' + encodeURIComponent(isDone));
+            }
+            var url = form.attr('action');
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            window.location.href = url;
+        });
+
+        // Handle reset button
+        $('#resetFilter').on('click', function() {
+            $('#daterange').val('');
+            $('#truk_id').val('');
+            $('#supir_id').val('');
+            $('#is_done').val('');
+            $('#daterange').data('daterangepicker').setStartDate(moment());
+            $('#daterange').data('daterangepicker').setEndDate(moment());
+        });
+    });
 </script>
-@endsection
+@endsection --}}
