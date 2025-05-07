@@ -17,13 +17,19 @@ class PerjalananController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
+        $role = $user && $user->role_id ? $user->role->slug : null;
         $isDone = $request->is_done;
         $trukId = $request->truk_id;
         $supirId = $request->supir_id;
         $defaultRangeTanggal = Carbon::now()->startOfMonth()->toDateString() . ' - ' . Carbon::now()->endOfMonth()->toDateString();
         $dateRange = $request->date_range ?? $defaultRangeTanggal;
 
-        $perjalanans = Perjalanan::when($isDone != null, function ($query) use ($isDone) {
+        $perjalanans = Perjalanan::orderBy('tanggal_berangkat','asc')
+            ->when($role == 'supir', function ($query) use ($user) {
+                return $query->where('user_id', $user->id);
+            })
+            ->when($isDone != null, function ($query) use ($isDone) {
                 return $query->where('is_done', $isDone);
             })
             ->when($trukId, function ($query) use ($trukId) {
