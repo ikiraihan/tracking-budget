@@ -341,6 +341,7 @@
     });
 </script>
 @endpush --}}
+{{-- @section('script')
 <script>
     $(document).ready(function() {
         // Inisialisasi DataTables baru
@@ -381,3 +382,4 @@
         });
     });
 </script>
+@endsection --}}

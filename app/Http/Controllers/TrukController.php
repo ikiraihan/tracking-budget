@@ -71,9 +71,9 @@ class TrukController extends Controller
                 'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
                 'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
                 'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
-                'sisa'             => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali,
+                'sisa'             => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali : 0,
                 'uang_setoran'           => $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
-                'bayaran_supir'    => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran,
+                'bayaran_supir'    => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran : 0,
 
                 'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
                 'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,

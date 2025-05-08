@@ -3,7 +3,7 @@
 
     <!-- Start::main-sidebar-header -->
     <div class="main-sidebar-header">
-        <a href="/admin/dashboard" class="header-logo">
+        <a href="/dashboard" class="header-logo">
             <img src="{{ asset('images/Teba_Express.png') }}" alt="logo" class="desktop-logo">
         </a>
     </div>

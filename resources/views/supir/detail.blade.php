@@ -87,7 +87,7 @@
                     </div>
                 </div>      
                 <div class="table-responsive">
-                    <table id="datatable-basic" class="table table-bordered text-nowrap w-100">
+                    <table id="datatable-perjalanan" class="table table-bordered text-nowrap w-100">
                         <thead>
                             <tr>
                                 <th style="width: 5px">No</th>

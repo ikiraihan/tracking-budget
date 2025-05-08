@@ -577,23 +577,6 @@
 
                     <!-- Start::header-element -->
                     <div class="header-element">
-                        <div class="horizontal-logo">
-                            <a href="index.html" class="header-logo">
-                                <img src="{{ asset('/Tema/dist/assets/images/brand-logos/desktop-logo.png') }}"
-                                    alt="logo" class="desktop-logo">
-                                <img src="{{ asset('/Tema/dist/assets/images/brand-logos/toggle-logo.png') }}"
-                                    alt="logo" class="toggle-logo">
-                                <img src="{{ asset('/Tema/dist/assets/images/brand-logos/desktop-white.png') }}"
-                                    alt="logo" class="desktop-white">
-                                <img src="{{ asset('/Tema/dist/assets/images/brand-logos/toggle-white.png') }}"
-                                    alt="logo" class="toggle-white">
-                            </a>
-                        </div>
-                    </div>
-                    <!-- End::header-element -->
-
-                    <!-- Start::header-element -->
-                    <div class="header-element">
                         <!-- Start::header-link -->
                         <a aria-label="Hide Sidebar"
                             class="sidemenu-toggle header-link animated-arrow hor-toggle horizontal-navtoggle"
@@ -607,13 +590,6 @@
                         <!-- End::header-link -->
                     </div>
                     <!-- End::header-element -->
-
-                </div>
-                <!-- End::header-content-left -->
-
-                <!-- Start::header-content-right -->
-                <div class="header-content-right">
-
                     <!-- Start::header-element -->
                     <div class="header-element header-theme-mode">
                         <!-- Start::header-link|layout-setting -->
@@ -640,14 +616,37 @@
                         <!-- End::header-link|layout-setting -->
                     </div>
                     <!-- End::header-element -->
+                    <!-- Start::header-element -->
+                    <div class="header-element">
+                        <div class="horizontal-logo">
+                            <a href="/dashboard" class="header-logo">
+                                <img src="{{ asset('images/Teba_Express.png') }}"
+                                    alt="logo" class="desktop-logo">
+                                <img src="{{ asset('images/Teba_Express.png') }}"
+                                    alt="logo" class="toggle-logo">
+                                <img src="{{ asset('images/Teba_Express.png') }}"
+                                    alt="logo" class="desktop-white">
+                                <img src="{{ asset('images/Teba_Express.png') }}"
+                                    alt="logo" class="toggle-white">
+                            </a>
+                        </div>
+                    </div>
+                    <!-- End::header-element -->
+
+                </div>
+                <!-- End::header-content-left -->
+
+                <!-- Start::header-content-right -->
+                <div class="header-content-right">
 
                     <!-- Start::header-element -->
                     <div class="header-element headerProfile-dropdown">
                         <!-- Start::header-link|dropdown-toggle -->
                         <form action="/logout" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-danger"><i
-                                    class="bx bx-log-out fs-18 me-2 op-7"></i>Sign Out</button>
+                            <button type="submit" class="btn btn-danger mt-3 mb-2">
+                                <i class="bx bx-log-out fs-18 me-2 op-7"></i>Sign Out
+                            </button>
                         </form>
                         <!-- End::header-link|dropdown-toggle -->
                         {{-- <ul class="main-header-dropdown dropdown-menu pt-0 header-profile-dropdown dropdown-menu-end main-profile-menu"
