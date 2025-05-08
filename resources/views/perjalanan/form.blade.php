@@ -17,23 +17,6 @@
                             @csrf                        
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <div class="form-group mb-3">
-                                        <label for="jalur">Jalur</label>                                        
-                                        <select id="jalur" name="jalur" class="form-control" required>
-                                            <option selected disabled>Pilih Kota</option>
-                                            <option value="full-tol">Full Tol</option>
-                                            <option value="setengah-tol">Setengah Tol</option>
-                                            <option value="bawah">Bawah</option>
-                                        </select>                                                                          
-                                    </div>
-                                </div> 
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label" for="uang_pengembalian_tol">Uang Pengembalian Tol</label>
-                                    <input type="text" id="uang_pengembalian_tol" name="uang_pengembalian_tol" class="form-control bg-secondary-transparent text-black" placeholder="0" readonly>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
                                     <label for="tanggal_berangkat" class="form-label" required>Tanggal Keberangkatan</label>
                                     <input type="date" class="form-control" name="tanggal_berangkat" id="tanggal_berangkat">
                                 </div>
@@ -50,7 +33,24 @@
                                         Apakah Perjalanan sudah dilakukan?
                                     </label>
                                 </div>
-                            </div>        
+                            </div>   
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-3" id="formJalur" style="display: none;">
+                                        <label for="jalur">Jalur</label>                                        
+                                        <select id="jalur" name="jalur" class="form-control" required>
+                                            <option selected disabled>Pilih Kota</option>
+                                            <option value="full-tol">Full Tol</option>
+                                            <option value="setengah-tol">Setengah Tol</option>
+                                            <option value="bawah">Bawah</option>
+                                        </select>                                                                          
+                                    </div>
+                                </div> 
+                                <div class="col-md-6 mb-3" id="formUangPengembalianTol" style="display: none;">
+                                    <label class="form-label" for="uang_pengembalian_tol">Uang Pengembalian Tol</label>
+                                    <input type="text" id="uang_pengembalian_tol" name="uang_pengembalian_tol" class="form-control bg-secondary-transparent text-black" placeholder="0" readonly>
+                                </div>
+                            </div>     
                             <div class="row">
                                 <div class="col-md-6 mb-3" id="formDate" style="display: none;">
                                     <label for="tanggal_kembali" class="form-label">Tanggal Kembali</label>
@@ -77,13 +77,21 @@
         const isChecked = document.getElementById('gridCheck').checked;
 
         const returnDate = document.getElementById('return_date');
+        const returnUangPengembalianTol = document.getElementById('uang_pengembalian_tol');
+        const returnJalur = document.getElementById('jalur');
 
         document.getElementById('formDate').style.display = isChecked ? 'block' : 'none';
+        document.getElementById('formUangPengembalianTol').style.display = isChecked ? 'block' : 'none';
+        document.getElementById('formJalur').style.display = isChecked ? 'block' : 'none';
 
         if (isChecked) {
             returnDate.setAttribute('required', 'required');
+            returnUangPengembalianTol.setAttribute('required', 'required');
+            returnJalur.setAttribute('required', 'required');
         } else {
             returnDate.removeAttribute('required');
+            returnUangPengembalianTol.removeAttribute('required');
+            returnJalur.removeAttribute('required');
         }
     }
     document.addEventListener("DOMContentLoaded", function () {

@@ -33,25 +33,29 @@ class UserSeeder extends Seeder
             'name' => 'Owner',
             'username' => 'owner',
             'password' => Hash::make('owner123'),
-            'role_id' => 2
+            'role_id' => 2,
+            'is_active' => true
         ]);
         User::create([
             'name' => 'Admin',
             'username' => 'admin',
             'password' => Hash::make('admin123'),
-            'role_id' => 1
+            'role_id' => 1,
+            'is_active' => true
         ]);
         User::create([
             'name' => 'Joko Anwar',
             'username' => 'joko_anwar',
             'password' => Hash::make('supir123'),
-            'role_id' => 3
+            'role_id' => 3,
+            'is_active' => true
         ]);
         User::create([
             'name' => 'Lionel Messi',
             'username' => 'lionel_messi',
             'password' => Hash::make('supir123'),
-            'role_id' => 3
+            'role_id' => 3,
+            'is_active' => true
         ]);
     }
 }

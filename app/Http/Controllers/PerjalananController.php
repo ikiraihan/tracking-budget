@@ -24,10 +24,9 @@ class PerjalananController extends Controller
         $supirId = $request->supir_id;
         $defaultRangeTanggal = Carbon::now()->startOfMonth()->toDateString() . ' - ' . Carbon::now()->endOfMonth()->toDateString();
         $dateRange = $request->date_range ?? $defaultRangeTanggal;
-
         $perjalanans = Perjalanan::orderBy('tanggal_berangkat','asc')
             ->when($role == 'supir', function ($query) use ($user) {
-                return $query->where('user_id', $user->id);
+                return $query->where('supir_id', $user->supir->id);
             })
             ->when($isDone != null, function ($query) use ($isDone) {
                 return $query->where('is_done', $isDone);
@@ -69,9 +68,9 @@ class PerjalananController extends Controller
                 'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
                 'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
                 'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
-                'sisa'             => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali,
+                'sisa'             => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali : 0,
                 'uang_setoran'           => $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
-                'bayaran_supir'    => $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran,
+                'bayaran_supir'    => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran : 0,
 
                 'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
                 'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,
@@ -95,31 +94,31 @@ class PerjalananController extends Controller
         $perjalanan = Perjalanan::findOrFail($id);
         
         $perjalananRemap = (object)[
-            'id'              => $perjalanan->id,
-            'hash'              => $perjalanan->hash,
-            'truk_id'         => $perjalanan->truk_id,
-            'truk_nama'      => $perjalanan->truk && $perjalanan->truk->nama ? $perjalanan->truk->nama : null,
-            'truk_nopol'      => $perjalanan->truk && $perjalanan->truk->no_polisi ? $perjalanan->truk->no_polisi : null,
-            'supir_id'        => $perjalanan->supir_id,
-            'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
-            'supir_telepon'      => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
-            'jalur'      => $perjalanan->jalur ? $perjalanan->jalur : null,
+                'id'              => $perjalanan->id,
+                'hash'              => $perjalanan->hash,
+                'truk_id'         => $perjalanan->truk_id,
+                'truk_nama'      => $perjalanan->truk && $perjalanan->truk->nama ? $perjalanan->truk->nama : null,
+                'truk_nopol'      => $perjalanan->truk && $perjalanan->truk->no_polisi ? $perjalanan->truk->no_polisi : null,
+                'supir_id'        => $perjalanan->supir_id,
+                'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
+                'supir_telepon'      => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
+                'jalur'      => $perjalanan->jalur ? $perjalanan->jalur : null,
 
-            'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
-            'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d F Y'): null,
-            'tanggal_kembali'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali): null,
-            'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d F Y'): null,
+                'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
+                'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d F Y'): null,
+                'tanggal_kembali'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali): null,
+                'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d F Y'): null,
 
-            'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
-            'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
-            'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
-            'sisa'             => $perjalanan->is_done == true ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali : 0,
-            'uang_setoran'           => $perjalanan->is_done == true && $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
-            'bayaran_supir'    => $perjalanan->is_done == true ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran : 0,
+                'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
+                'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
+                'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
+                'sisa'             => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali : 0,
+                'uang_setoran'           =>  $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
+                'bayaran_supir'    => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran : 0,
 
-            'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
-            'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,
-        ];
+                'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
+                'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,
+            ];
 
         return view('perjalanan.detail', [
             'perjalanan' => $perjalananRemap,

@@ -118,7 +118,7 @@
                                 <th>Nama Truk</th>
                                 <th>Jalur</th>
                                 <th>Uang Kembali</th>
-                                <th>Sisa</th>
+                                <th>Setoran</th>
                                 <th>Bayaran Supir</th>
                                 <th>Status</th>
                             </tr>
@@ -163,7 +163,7 @@
                                         @endif
                                     </td>
                                     <td>Rp. {{ number_format($item->uang_kembali ?? 0, 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($item->sisa ?? 0, 0, ',', '.') }}</td>
+                                    <td>Rp. {{ number_format($item->uang_setoran ?? 0, 0, ',', '.') }}</td>
                                     <td>Rp. {{ number_format($item->bayaran_supir ?? 0, 0, ',', '.') }}</td>
                                     {{-- <th class="{{ ($item->total ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
                                         Rp. {{ number_format($item->total ?? 0, 0, ',', '.') }}
@@ -182,7 +182,7 @@
                             <tr class="fw-bold bg-light">
                                 <td colspan="6" class="text-end">Total Keseluruhan:</td>
                                 <td>Rp. {{ number_format($perjalanan->sum('uang_kembali') ?? 0, 0, ',', '.') }}</td>
-                                <td>Rp. {{ number_format($perjalanan->sum('sisa') ?? 0, 0, ',', '.') }}</td>
+                                <td>Rp. {{ number_format($perjalanan->sum('uang_setoran') ?? 0, 0, ',', '.') }}</td>
                                 <td>Rp. {{ number_format($perjalanan->sum('bayaran_supir') ?? 0, 0, ',', '.') }}</td>
                                 {{-- <td class="{{ $perjalanan->sum('total') < 0 ? 'text-danger' : 'text-success' }}">
                                     Rp. {{ number_format($perjalanan->sum('total') ?? 0, 0, ',', '.') }}

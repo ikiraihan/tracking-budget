@@ -207,6 +207,16 @@
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
+                                    <label class="form-label fw-medium">Setoran</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->uang_setoran ?? 0, 0, ',', '.') }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
                                     <label class="form-label fw-medium">Bayaran Supir</label>
                                 </div>
                                 <div class="col-md-9">

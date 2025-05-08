@@ -96,11 +96,11 @@
                                             </div>
 
                                             <!-- Footer Links -->
-                                            <div class="main-signin-footer mt-5">
+                                            {{-- <div class="main-signin-footer mt-5">
                                                 <p>Belum memiliki akun ? 
                                                     <a href="/register">Registrasi</a>
                                                 </p>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>

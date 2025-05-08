@@ -3,9 +3,11 @@
 @section('content')
 <div class="container-fluid">
     <div class="mb-2">
+        @if($role == 'admin')
         <a href="/supir/create" type="button" class="btn btn-primary-transparent">
             Tambah Supir
         </a>
+        @endif
     </div>
     <div class="card custom-card">
         <div class="card-header d-flex justify-content-between align-items-center">
