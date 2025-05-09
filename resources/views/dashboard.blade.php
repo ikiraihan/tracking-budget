@@ -8,16 +8,39 @@
             <h4 class="mb-0">Dashboard</h4>
             {{-- <p class="mb-0 text-muted">Sales monitoring dashboard template.</p> --}}
         </div>
+        <form action="" method="GET" class="ms-auto" style="max-width: 600px;">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="ri-calendar-line"></i></span>
+                        <input type="text" class="form-control" id="date_range" name="date_range" value="{{ old('date_range', $default_range) }}" placeholder="Pilih Range Tanggal">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" id="applyFilterDashboard" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </div>
+        </form>
     </div>
     <!-- End Page Header -->
     <div class="row">
         <div class="col-xl-6">
             <div class="card custom-card">
                 <div class="card-header">
-                    <div class="card-title">Grafik Truk</div>
+                    <div class="card-title">Perjalanan per Truk</div>
                 </div>
                 <div class="card-body">
                     <canvas id="graphValuePerTruk" class="chartjs-chart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card custom-card">
+                <div class="card-header">
+                    <div class="card-title">Perjalanan per Status</div>
+                </div>
+                <div class="card-body">
+                    <canvas id="graphValuePerStatus" class="chartjs-chart" width="400" height="400"></canvas>
                 </div>
             </div>
         </div>
@@ -54,9 +77,11 @@
 </script> --}}
 <script>
     var graphValuePerTruk = @json($graphValuePerTruk);
+    var graphValuePerStatus = @json($graphValuePerStatus);
 
     document.addEventListener("DOMContentLoaded", function() {
         createDoughnutValuePerTruk('graphValuePerTruk', graphValuePerTruk);
+        createDoughnutValuePerStatus('graphValuePerStatus', graphValuePerStatus);
     });
 
     // Fungsi untuk membuat Doughnut Chart
@@ -110,9 +135,59 @@
         });
     }
 
-    document.getElementById('applyFilter').addEventListener('click', function () {
+    function createDoughnutValuePerStatus(canvasId, data) {
+        var ctx = document.getElementById(canvasId).getContext('2d');
+        var labels = data.map(item => item.nama);
+        var counts = data.map(item => item.count);
+        var colors = data.map(item => item.color);
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: counts,
+                    backgroundColor: colors,
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'left',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 10,
+                            padding: 15,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    datalabels: {  
+                        color: '#fff', 
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        borderRadius: 5, 
+                        padding: 6,
+                        font: {
+                            weight: 'bold',
+                            size: 7
+                        },
+                        formatter: (value, ctx) => {
+                            let label = ctx.chart.data.labels[ctx.dataIndex];
+                            return `${label}\n${value}`;
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels] // Aktifkan plugin datalabels
+        });
+    }
+
+    document.getElementById('applyFilterDashboard').addEventListener('click', function () {
         const dateRange = document.getElementById('date_range').value;
-        const baseUrl = `/admin_sdm/dashboard/`; // Bangun URL dinamis
+        const baseUrl = `/dashboard`; // Bangun URL dinamis
 
         let queryParams = [];
         if (dateRange) {

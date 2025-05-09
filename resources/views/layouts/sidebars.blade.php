@@ -21,6 +21,7 @@
                 </svg>
             </div>
                 <ul class="main-menu">
+                    @if(Auth::check() && in_array(Auth::user()->role_id,[1,2]))
                     <li class="slide mt-3">
                         <a href="/dashboard"
                         class="side-menu__item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -33,6 +34,7 @@
                         <span class="side-menu__label">Dashboard</span>
                         </a>
                     </li>
+                    @endif
                     <!-- Start::slide -->
                     @if(Auth::check() && Auth::user()->role_id === 3)
                         <li class="slide__category"><span class="category-name">Form</span></li>

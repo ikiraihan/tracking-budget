@@ -25,6 +25,24 @@
                                     <label class="form-label" for="uang_kembali" required>Uang Kembali</label>
                                     <input type="text" id="uang_kembali" name="uang_kembali" value="{{ old('uang_kembali', $perjalanan->uang_kembali) }}" class="form-control" placeholder="Masukkan Uang Kembali.." required>
                                 </div>
+                                {{-- Foto Diri --}}
+                                <div class="col-md-6 mb-2">
+                                    <label for="photo_struk_kembali" class="form-label">Foto Struk Kembali <span style="color: red;">*</span></label>
+                                    <input type="file" class="form-control @error('photo_struk_kembali') is-invalid @enderror" 
+                                        id="photo_struk_kembali" name="photo_struk_kembali" accept=".jpg,.jpeg,.png">                                    
+                                    @error('photo_struk_kembali')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div class="mt-2">
+                                        <img id="preview-photo_struk_kembali" 
+                                            src="{{ $perjalanan->path_struk_kembali ? asset($perjalanan->path_struk_kembali) : '#' }}" 
+                                            alt="Preview Foto Struk" 
+                                            class="img-thumbnail" 
+                                            width="150"
+                                            style="{{ $perjalanan->path_struk_kembali ? '' : 'display: none;' }}"
+                                            data-old-src="{{ $perjalanan->path_struk_kembali ? asset($perjalanan->path_struk_kembali) : '' }}">
+                                    </div>
+                                </div>
                             </div>
                         
                             <div class="col-md-12">

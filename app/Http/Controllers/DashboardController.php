@@ -27,34 +27,22 @@ class DashboardController extends Controller
             $startDateRange = Carbon::parse($startDateRange);
             $endDateRange = Carbon::parse($endDateRange);
         }else{
-            $startDateRange = Carbon::now()->subMonth()->day(26);
-            $endDateRange = Carbon::now()->day(25);           
+            $startDateRange = Carbon::now()->startOfMonth();
+            $endDateRange = Carbon::now()->endOfMonth();           
         }
 
         $arrYear = range(max($startDateRange->year, $endDateRange->year), min($startDateRange->year, $endDateRange->year));
         $graphDTO = new GraphDTO($startDateRange,$endDateRange);
-        
-        // $user = Auth::user();
-        // $role = $user->role_id ? $user->role->slug : null;
-        //$arrYear = [2025,2024];
-        // switch($role){
-        //     case'admin':
-        //     case'owner':
-        //         $graphDTO = new GraphDTO($startDateRange,$endDateRange);
-        //         break;
-        //     default:
-        //         $supirId = $user->supir ? $user->supir->id : null;
-        //         $graphDTO = new GraphDTO($startDateRange,$endDateRange,$user->id,$supirId);
-        //         break;
-        // }
-
+    
         $graphValuePerTruk = $this->dashboardService->graphValuePerTruk($graphDTO);
+        $graphValuePerStatus = $this->dashboardService->graphValuePerStatus($graphDTO);
 
         $data = [
             'title' => 'Dashboard Absensi',
             'arr_year' => $arrYear,
             'default_range' => $startDateRange . ' to ' . $endDateRange,
             'graphValuePerTruk' => $graphValuePerTruk,
+            'graphValuePerStatus' => $graphValuePerStatus,
         ];
 
         return view('dashboard', $data);

@@ -197,6 +197,22 @@
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
+                                    <label class="form-label fw-medium">File Struk Kembali</label>
+                                </div>
+                                <div class="col-md-9">
+                                    @if ($perjalanan->path_struk_kembali)
+                                    <a href="{{ asset($perjalanan->path_struk_kembali) }}" target="_blank" style="color: blue; text-decoration: underline;">
+                                        Lihat File
+                                    </a>
+                                    @else
+                                        -
+                                    @endif                          
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
                                     <label class="form-label fw-medium">Sisa</label>
                                 </div>
                                 <div class="col-md-9">

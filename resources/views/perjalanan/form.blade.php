@@ -13,22 +13,39 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <form action="{{ route('perjalanan.store') }}" method="POST">
+                        <form action="{{ route('perjalanan.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf                        
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="tanggal_berangkat" class="form-label" required>Tanggal Keberangkatan</label>
+                                    <label for="tanggal_berangkat" class="form-label" required>Tanggal Keberangkatan<span style="color: red;">*</span></label>
                                     <input type="date" class="form-control" name="tanggal_berangkat" id="tanggal_berangkat">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label" for="uang_kembali" required>Uang Kembali</label>
+                                    <label class="form-label" for="uang_kembali" required>Uang Kembali<span style="color: red;">*</span></label>
                                     <input type="text" id="uang_kembali" name="uang_kembali" class="form-control" placeholder="Masukkan Uang Kembali.." required>
+                                </div>
+                                {{-- Foto Struk Kembali --}}
+                                <div class="col-md-6 mb-2">
+                                    <label for="photo_struk_kembali" class="form-label">Foto Struk Kembali<span style="color: red;">*</span></label>
+                                    <input type="file" class="form-control @error('photo_struk_kembali') is-invalid @enderror" 
+                                        id="photo_struk_kembali" name="photo_struk_kembali" accept="image/*" required>
+                                    @error('photo_struk_kembali')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div class="mt-2">
+                                        <img id="preview-photo_struk_kembali" 
+                                            src="'#'" 
+                                            alt="Preview Foto Struk" 
+                                            class="img-thumbnail" 
+                                            width="150"
+                                            style="display: none;">
+                                    </div>
                                 </div>
                             </div>
                         
                             <div class="col-md-12">
                                 <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="gridCheck" name="is_done" value="1" onchange="toggleForm()">
+                                    <input class="form-check-input" type="checkbox" id="gridCheck" name="is_done" value="1" onchange="toggleForm()" style="transform: scale(1.5); margin-right: 8px;">
                                     <label class="form-check-label" for="gridCheck">
                                         Apakah Perjalanan sudah dilakukan?
                                     </label>
@@ -39,7 +56,7 @@
                                     <div class="form-group mb-3" id="formJalur" style="display: none;">
                                         <label for="jalur">Jalur</label>                                        
                                         <select id="jalur" name="jalur" class="form-control" required>
-                                            <option selected disabled>Pilih Kota</option>
+                                            <option selected disabled>--Pilih Jalur--</option>
                                             <option value="full-tol">Full Tol</option>
                                             <option value="setengah-tol">Setengah Tol</option>
                                             <option value="bawah">Bawah</option>
@@ -54,7 +71,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3" id="formDate" style="display: none;">
                                     <label for="tanggal_kembali" class="form-label">Tanggal Kembali</label>
-                                    <input type="date" class="form-control" id="tanggal_kembali" name="tanggal_kembali">
+                                    <input type="date" class="form-control" id="tanggal_kembali" name="tanggal_kembali" required>
                                 </div>
                             </div>
                         
@@ -76,7 +93,7 @@
     function toggleForm() {
         const isChecked = document.getElementById('gridCheck').checked;
 
-        const returnDate = document.getElementById('return_date');
+        const returnDate = document.getElementById('tanggal_kembali');
         const returnUangPengembalianTol = document.getElementById('uang_pengembalian_tol');
         const returnJalur = document.getElementById('jalur');
 

@@ -91,38 +91,52 @@ class PerjalananController extends Controller
 
     public function detail($id)
     {
-        $perjalanan = Perjalanan::findOrFail($id);
-        
-        $perjalananRemap = (object)[
+        try {
+            $user = Auth::user();
+            $role = $user->role_id ? $user->role->slug : null;
+            $supir = $user->supir ? $user->supir->id : null;
+            $perjalanan = Perjalanan::findOrFail($id);
+    
+            // Check if the authenticated user is a supir and matches the perjalanan's supir_id
+            if ( $role == 'supir' && $user->supir->id != $perjalanan->supir_id) {
+                throw new Exception('Anda tidak memiliki akses untuk melihat detail perjalanan ini.');
+            }
+    
+            // Remap the perjalanan data
+            $perjalananRemap = (object)[
                 'id'              => $perjalanan->id,
-                'hash'              => $perjalanan->hash,
+                'hash'            => $perjalanan->hash,
                 'truk_id'         => $perjalanan->truk_id,
-                'truk_nama'      => $perjalanan->truk && $perjalanan->truk->nama ? $perjalanan->truk->nama : null,
+                'truk_nama'       => $perjalanan->truk && $perjalanan->truk->nama ? $perjalanan->truk->nama : null,
                 'truk_nopol'      => $perjalanan->truk && $perjalanan->truk->no_polisi ? $perjalanan->truk->no_polisi : null,
                 'supir_id'        => $perjalanan->supir_id,
                 'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
-                'supir_telepon'      => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
-                'jalur'      => $perjalanan->jalur ? $perjalanan->jalur : null,
-
-                'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
-                'tanggal_berangkat_format'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d F Y'): null,
-                'tanggal_kembali'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali): null,
-                'tanggal_kembali_format'=> $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d F Y'): null,
-
-                'uang_pengembalian_tol'           => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
-                'uang_subsidi_tol'           => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
-                'uang_kembali'           => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
-                'sisa'             => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali : 0,
-                'uang_setoran'           =>  $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
-                'bayaran_supir'    => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran : 0,
-
-                'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
-                'is_done'      => $perjalanan->is_done ? $perjalanan->is_done : null,
+                'supir_telepon'   => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
+                'jalur'           => $perjalanan->jalur ? $perjalanan->jalur : null,
+    
+                'tanggal_berangkat'        => $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat) : null,
+                'tanggal_berangkat_format' => $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat)->translatedFormat('d F Y') : null,
+                'tanggal_kembali'          => $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali) : null,
+                'tanggal_kembali_format'   => $perjalanan->tanggal_kembali ? Carbon::parse($perjalanan->tanggal_kembali)->translatedFormat('d F Y') : null,
+    
+                'uang_pengembalian_tol'    => $perjalanan->uang_pengembalian_tol ? $perjalanan->uang_pengembalian_tol : 0,
+                'uang_subsidi_tol'         => $perjalanan->uang_subsidi_tol ? $perjalanan->uang_subsidi_tol : 0,
+                'uang_kembali'             => $perjalanan->uang_kembali ? $perjalanan->uang_kembali : 0,
+                'sisa'                     => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali : 0,
+                'uang_setoran'             => $perjalanan->uang_setoran ? $perjalanan->uang_setoran : 0,
+                'bayaran_supir'            => $perjalanan->is_done ? $perjalanan->uang_pengembalian_tol + $perjalanan->uang_subsidi_tol - $perjalanan->uang_kembali - $perjalanan->uang_setoran : 0,
+    
+                'path_struk_kembali'       => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
+                'is_done'                  => $perjalanan->is_done ? $perjalanan->is_done : null,
             ];
-
-        return view('perjalanan.detail', [
-            'perjalanan' => $perjalananRemap,
-        ]);
+    
+            return view('perjalanan.detail', [
+                'perjalanan' => $perjalananRemap,
+            ]);
+        } catch (\Exception $e) {
+            // Handle other unexpected errors
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
     
     public function formIndex()
@@ -153,11 +167,12 @@ class PerjalananController extends Controller
 
             $rules = [
                 'tanggal_berangkat' => 'required|date',
-                'tanggal_kembali' => 'nullable|date',
-                'uang_pengembalian_tol' => 'nullable|numeric',
                 'uang_kembali' => 'nullable|numeric',
-                'jalur' => 'nullable|in:full-tol,setengah-tol,bawah',
+                'photo_struk_kembali' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
                 'is_done' => 'nullable|boolean',
+                'uang_pengembalian_tol' => 'nullable|numeric|required_if:is_done,1',
+                'tanggal_kembali' => 'nullable|date|required_if:is_done,1',
+                'jalur' => 'nullable|in:full-tol,setengah-tol,bawah|required_if:is_done,1',
             ];
 
             if (in_array($role, ['owner', 'admin'])) {
@@ -167,11 +182,21 @@ class PerjalananController extends Controller
 
             $request->validate($rules);
 
-            $kode = config('constants.kode_jalur.'.$request->jalur) ?? 'XX';
+            // $kode = config('constants.kode_jalur.'.$request->jalur) ?? 'XX';
             $tanggal = now()->format('ymd');
             $countToday = Perjalanan::whereDate('created_at', now()->toDateString())->count();       
             $urut = str_pad($countToday + 1, 3, '0', STR_PAD_LEFT);        
-            $hash = "$kode/$tanggal/$urut";
+            $hash = "TB-$tanggal$urut";
+            $path = null;
+
+            if ($request->hasFile('photo_struk_kembali') && $request->file('photo_struk_kembali')->isValid()) {
+                $file = $request->file('photo_struk_kembali');
+                $filename = time() . '_struk_' . $file->getClientOriginalName();
+                $destination = public_path('/uploads/perjalanan/struk');
+                if (!file_exists($destination)) mkdir($destination, 0755, true);
+                $file->move($destination, $filename);
+                $path = '/uploads/perjalanan/struk/' . $filename;
+            }
 
             Perjalanan::create([
                 'hash' => $hash,
@@ -182,6 +207,7 @@ class PerjalananController extends Controller
                 'jalur' => $request->jalur,
                 'uang_pengembalian_tol' => $request->uang_pengembalian_tol ?? 0,
                 'uang_kembali' => $request->uang_kembali ?? 0,
+                'path_struk_kembali' => $path ?? null,
                 'uang_subsidi_tol' => config('constants.uang.uang_subsidi_tol') ?? 0,
                 'uang_setoran' => config('constants.uang.uang_setoran') ?? 0,
                 'is_done' => $request->is_done ?? false,
@@ -214,16 +240,28 @@ class PerjalananController extends Controller
                 'uang_pengembalian_tol' => 'nullable|numeric',
                 'uang_kembali' => 'nullable|numeric',
                 'jalur' => 'nullable|in:full-tol,setengah-tol,bawah',
+                'photo_struk_kembali' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
                 'is_done' => 'nullable|boolean',
             ]);
     
             $perjalanan = Perjalanan::findOrFail($id);
+
+            if ($request->hasFile('photo_struk_kembali') && $request->file('photo_struk_kembali')->isValid()) {
+                $file = $request->file('photo_struk_kembali');
+                $filename = time() . '_struk_' . $file->getClientOriginalName();
+                $destination = public_path('/uploads/perjalanan/struk');
+                if (!file_exists($destination)) mkdir($destination, 0755, true);
+                $file->move($destination, $filename);
+                $path = '/uploads/perjalanan/struk/' . $filename;
+            }
+
             $perjalanan->update([
                 'tanggal_berangkat' => $request->tanggal_berangkat,
                 'tanggal_kembali' => $request->tanggal_kembali,
                 'jalur' => $request->jalur,
                 'uang_pengembalian_tol' => $request->uang_pengembalian_tol ?? 0,
                 'uang_kembali' => $request->uang_kembali ?? 0,
+                'path_struk_kembali' => $path ?? null,
                 // 'uang_subsidi_tol' => config('constants.uang.uang_subsidi_tol') ?? 0,
                 // 'uang_setoran' => config('constants.uang.uang_setoran') ?? 0,
                 'is_done' => $request->is_done ?? false,

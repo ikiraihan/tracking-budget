@@ -117,6 +117,7 @@
                                 <th>Tanggal Perjalanan</th>
                                 <th>Nama Truk</th>
                                 <th>Jalur</th>
+                                <th>File Struk Kembali</th>
                                 <th>Uang Kembali</th>
                                 <th>Setoran</th>
                                 <th>Bayaran Supir</th>
@@ -162,6 +163,15 @@
                                             -
                                         @endif
                                     </td>
+                                    <td>
+                                        @if ($item->path_struk_kembali)
+                                            <a href="{{ asset($item->path_struk_kembali) }}" target="_blank" style="color: blue; text-decoration: underline;">
+                                                Lihat File
+                                            </a>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td>Rp. {{ number_format($item->uang_kembali ?? 0, 0, ',', '.') }}</td>
                                     <td>Rp. {{ number_format($item->uang_setoran ?? 0, 0, ',', '.') }}</td>
                                     <td>Rp. {{ number_format($item->bayaran_supir ?? 0, 0, ',', '.') }}</td>
@@ -180,7 +190,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="fw-bold bg-light">
-                                <td colspan="6" class="text-end">Total Keseluruhan:</td>
+                                <td colspan="7" class="text-end">Total Keseluruhan:</td>
                                 <td>Rp. {{ number_format($perjalanan->sum('uang_kembali') ?? 0, 0, ',', '.') }}</td>
                                 <td>Rp. {{ number_format($perjalanan->sum('uang_setoran') ?? 0, 0, ',', '.') }}</td>
                                 <td>Rp. {{ number_format($perjalanan->sum('bayaran_supir') ?? 0, 0, ',', '.') }}</td>

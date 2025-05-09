@@ -174,53 +174,5 @@
         </div>
     </div>
 </div>
-@endsection
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const fileInputs = ['photo_diri', 'photo_ktp', 'photo_sim']; // Hapus 'photo' jika tidak digunakan
-
-    fileInputs.forEach(function(inputId) {
-        const input = document.getElementById(inputId);
-        const preview = document.getElementById('preview-' + inputId);
-
-        if (input && preview) {
-            // Simpan URL gambar lama dari dataset atau atribut src awal
-            preview.dataset.oldSrc = preview.src || '';
-
-            input.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    // Validasi ukuran file (4MB)
-                    if (file.size > 4 * 1024 * 1024) {
-                        alert('File terlalu besar! Maksimum 4MB.');
-                        input.value = ''; // Kosongkan input
-                        preview.src = preview.dataset.oldSrc || '#';
-                        preview.style.display = preview.dataset.oldSrc ? 'block' : 'none';
-                        return;
-                    }
-                    // Validasi tipe file
-                    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
-                        alert('Hanya file JPG, JPEG, atau PNG yang diperbolehkan.');
-                        input.value = ''; // Kosongkan input
-                        preview.src = preview.dataset.oldSrc || '#';
-                        preview.style.display = preview.dataset.oldSrc ? 'block' : 'none';
-                        return;
-                    }
-                    // Tampilkan pratinjau gambar baru
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    // Kembalikan ke gambar lama jika input dikosongkan
-                    preview.src = preview.dataset.oldSrc || '#';
-                    preview.style.display = preview.dataset.oldSrc ? 'block' : 'none';
-                }
-            });
-        }
-    });
-});
-</script>     
+@endsection  
     

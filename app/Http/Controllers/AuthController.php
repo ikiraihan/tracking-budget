@@ -116,8 +116,14 @@ class AuthController extends Controller
             }
 
             Auth::login($user);
+            
+            $role = $user->role_id ? $user->role->slug : 'supir';
 
-            return redirect('/dashboard');
+            if($role == 'supir'){
+                return redirect('/perjalanan/form');
+            }else{
+                return redirect('/dashboard');
+            }
         } catch (\Exception $e) {
             return back()->withInput()
             ->with(['error' => $e->getMessage()]);
