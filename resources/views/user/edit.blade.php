@@ -7,7 +7,7 @@
             <div class="card custom-card">
                 <div class="card-header justify-content-between">
                     <div class="card-title">
-                        Edit Data Supir
+                        Edit Data User
                     </div>
                 </div>
                 <div class="card-body">

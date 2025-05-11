@@ -7,7 +7,7 @@
             <div class="card custom-card">
                 <div class="card-header justify-content-between">
                     <div class="card-title">
-                        Tambah Data Supir
+                        Tambah Data User
                     </div>
                 </div>
                 <div class="card-body">

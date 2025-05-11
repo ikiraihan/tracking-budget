@@ -7,7 +7,7 @@
             <div class="card custom-card">
                 <div class="card-header justify-content-between">
                     <div class="card-title">
-                        Ubah Password Supir
+                        Ubah Password User
                     </div>
                 </div>
                 <div class="card-body">
