@@ -53,7 +53,7 @@ class DashboardService
                 'nama'  => $status ? 'Selesai' : 'Belum Selesai',
                 'slug'  => $status ? 'selesai' : 'belum-selesai',
                 'count' => $perjalanans->where('is_done', $status)->count(),
-                'color' => $status ? 'rgb(204,0,0)' : 'rgb(38,153,38)',
+                'color' => $status ? 'rgb(38,153,38)' : 'rgb(204,0,0)',
             ];
         });
 

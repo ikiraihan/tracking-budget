@@ -98,7 +98,7 @@
                                                 <a href="/truk/edit/{{ $item->id }}" class="btn btn-warning-transparent"><i class="fas fa-edit"></i></a>
                                                 <form action="/truk/delete/{{ $item->id }}" method="POST" class="d-inline">
                                                     @csrf
-                                                    @method('PUT')
+                                                    @method('DELETE')
                                                     <button type="submit" class="btn btn-danger-transparent" onclick="return confirm('Apakah anda yakin ingin menghapus data secara permanen?')">
                                                         <i class="fas fa-trash"></i>
                                                     </button>

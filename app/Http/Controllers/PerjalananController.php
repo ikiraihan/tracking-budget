@@ -85,6 +85,7 @@ class PerjalananController extends Controller
             'trukId' => $trukId,
             'supirId' => $supirId,
             'dateRange' => $dateRange,
+            'role' => $role
         ]);
         
     }
@@ -184,7 +185,7 @@ class PerjalananController extends Controller
 
             // $kode = config('constants.kode_jalur.'.$request->jalur) ?? 'XX';
             $tanggal = now()->format('ymd');
-            $countToday = Perjalanan::whereDate('created_at', now()->toDateString())->count();       
+            $countToday = Perjalanan::withTrashed()->whereDate('created_at', now()->toDateString())->count();       
             $urut = str_pad($countToday + 1, 3, '0', STR_PAD_LEFT);        
             $hash = "TB-$tanggal$urut";
             $path = null;

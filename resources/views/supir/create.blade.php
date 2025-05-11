@@ -12,7 +12,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <form action="/supir/store" method="POST" enctype="multipart/form-data">
+                        <form id="formSupir" action="/supir/store" method="POST" enctype="multipart/form-data">
                             @csrf                       
                             <div class="row">
                                 {{-- Foto Diri --}}
@@ -175,7 +175,12 @@
                             </div>
                         
                             <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary">Kirim</button>
+                                <button type="submit" id="btnSubmit" class="btn btn-primary">
+                                    Kirim
+                                </button>                           
+                                <button type="button" id="btnLoading" class="btn btn-primary d-none" disabled>
+                                    <i class="ri-loader-2-fill fs-16 me-2"></i> Loading...
+                                </button>
                                 <a href="/supir" class="btn btn-secondary">Kembali</a>
                             </div>
                         </form>                  
@@ -233,6 +238,17 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
+});
+document.addEventListener('DOMContentLoaded', function () {
+
+        const form = document.getElementById('formSupir');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnLoading = document.getElementById('btnLoading');
+
+        form.addEventListener('submit', function () {
+            btnSubmit.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+        });
 });
 </script>     
     

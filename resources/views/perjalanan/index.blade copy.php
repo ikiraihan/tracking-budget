@@ -117,7 +117,6 @@
                                 <th>Tanggal Perjalanan</th>
                                 <th>Nama Truk</th>
                                 <th>Jalur</th>
-                                <th>File Struk Kembali</th>
                                 <th>Uang Kembali</th>
                                 <th>Setoran</th>
                                 <th>Bayaran Supir</th>
@@ -163,15 +162,6 @@
                                             -
                                         @endif
                                     </td>
-                                    <td>
-                                        @if ($item->path_struk_kembali)
-                                            <a href="{{ asset($item->path_struk_kembali) }}" target="_blank" style="color: blue; text-decoration: underline;">
-                                                Lihat File
-                                            </a>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
                                     <td>Rp. {{ number_format($item->uang_kembali ?? 0, 0, ',', '.') }}</td>
                                     <td>Rp. {{ number_format($item->uang_setoran ?? 0, 0, ',', '.') }}</td>
                                     <td>Rp. {{ number_format($item->bayaran_supir ?? 0, 0, ',', '.') }}</td>
@@ -190,7 +180,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="fw-bold bg-light">
-                                <td colspan="7" class="text-end">Total Keseluruhan:</td>
+                                <td colspan="6" class="text-end">Total Keseluruhan:</td>
                                 <td>Rp. {{ number_format($perjalanan->sum('uang_kembali') ?? 0, 0, ',', '.') }}</td>
                                 <td>Rp. {{ number_format($perjalanan->sum('uang_setoran') ?? 0, 0, ',', '.') }}</td>
                                 <td>Rp. {{ number_format($perjalanan->sum('bayaran_supir') ?? 0, 0, ',', '.') }}</td>
@@ -220,10 +210,7 @@
                     <div class="mb-3">
                         <label class="form-label">Tanggal</label>
                         <input type="text" id="daterange" name="date_range" class="form-control form-control-sm" value="{{ old('date_range', $dateRange ?? '') }}">
-                        {{-- <input type="text" id="daterange-display" class="form-control form-control-sm" value="{{ old('date_range', $dateRange ?? '') }}" placeholder="Pilih Range Tanggal" readonly>
-                        <input type="hidden" id="daterange" name="date_range" value="{{ old('date_range', $dateRange ?? '') }}"> --}}
                     </div>
-                    @if(in_array($role,['admin','owner']))
                     <div class="mb-3">
                         <label class="form-label">Truk</label>
                         <select class="form-control form-control-sm @error('truk_id') is-invalid @enderror" name="truk_id" id="truk_id">
@@ -252,7 +239,6 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    @endif
                     <div class="mb-3">
                         <label class="form-label">Status</label>
                         <select class="form-control form-control-sm @error('is_done') is-invalid @enderror" name="is_done" id="is_done">
@@ -355,7 +341,6 @@
     });
 </script>
 @endpush --}}
-{{-- @section('script')
 <script>
     $(document).ready(function() {
         // Inisialisasi DataTables baru
@@ -396,4 +381,3 @@
         });
     });
 </script>
-@endsection --}}

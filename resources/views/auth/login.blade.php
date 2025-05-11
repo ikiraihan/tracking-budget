@@ -39,8 +39,8 @@
             <div class="col-md-5 col-lg-5 col-xl-5 d-none d-md-flex bg-primary-transparent-3">
                 <div class="row w-100 mx-auto text-center">
                     <div class="col-md-12 col-lg-12 col-xl-12 my-auto mx-auto w-100">
-                        {{-- <img src="{{ asset('images/Teba_Express.png') }}"
-                            class="my-auto ht-xl-80p wd-md-100p wd-xl-80p mx-auto" alt="logo"> --}}
+                        <img src="{{ asset('images/Teba_Express.png') }}"
+                            class="my-auto ht-xl-80p wd-md-100p wd-xl-80p mx-auto" alt="logo">
                     </div>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                         <div class="row">
                             <div class="col-md-10 col-lg-10 col-xl-9 mx-auto">
                                 <div class="card-sigin">
-                                    <div class="mb-5">
+                                    <div class="mb-3">
                                         <a href="/" class="header-logo">
                                             <img src="{{ asset('images/Teba_Express.png') }}"
                                                 class="desktop-logo ht-40" alt="logo">

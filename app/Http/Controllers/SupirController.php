@@ -139,7 +139,7 @@ class SupirController extends Controller
     
             $supir->save();
     
-            return redirect()->route('/supir')->with('success', 'Supir Berhasil dibuat!');
+            return redirect()->route('supir.index')->with('success', 'Supir Berhasil dibuat!');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withInput()
@@ -232,7 +232,7 @@ class SupirController extends Controller
             $supir->no_ktp = $request->no_ktp;
             $supir->no_sim = $request->no_sim;
             $supir->truk_id = $request->truk_id;
-            $supir->is_active = $request->is_active;
+            $supir->is_active = $request->is_active ?? true;
 
             if ($request->hasFile('photo_diri') && $request->file('photo_diri')->isValid()) {
                 $file = $request->file('photo_diri');
@@ -263,7 +263,7 @@ class SupirController extends Controller
 
             $supir->save();
 
-            return redirect('/supir')->with('success', 'Data supir berhasil diperbarui!');
+            return redirect()->route('supir.index')->with('success', 'Data supir berhasil diperbarui!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with(['error' => 'Terjadi kesalahan saat memperbarui data. Pesan: ' . $e->getMessage()]);
         }
@@ -300,7 +300,7 @@ class SupirController extends Controller
 
             $user->save();
 
-            return redirect('/supir')->with('success', 'Password Berhasil diperbarui!');
+            return redirect()->route('supir.index')->with('success', 'Password Berhasil diperbarui!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with(['error' => 'Terjadi kesalahan saat memperbarui data. Pesan: ' . $e->getMessage()]);
         }
@@ -338,7 +338,7 @@ class SupirController extends Controller
                 $message = 'Akun Supir berhasil dihapus!';
             }
 
-            return redirect('/supir')->with('success', $message);
+            return redirect()->route('supir.index')->with('success', $message);
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with(['error' => 'Terjadi kesalahan saat memperbarui data. Pesan: ' . $e->getMessage()]);
         }

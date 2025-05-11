@@ -12,7 +12,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <form action="{{ url('/truk/store') }}" method="POST" enctype="multipart/form-data">
+                        <form id="formTruk" action="{{ url('/truk/store') }}" method="POST" enctype="multipart/form-data">
                             @csrf                         
                             <div class="row">
                                 <div class="col-md-12">
@@ -40,7 +40,12 @@
                                 </div>                                
                             </div>
                             <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary">Kirim</button>
+                                <button type="submit" id="btnSubmit" class="btn btn-primary">
+                                    Kirim
+                                </button>                           
+                                <button type="button" id="btnLoading" class="btn btn-primary d-none" disabled>
+                                    <i class="ri-loader-2-fill fs-16 me-2"></i> Loading...
+                                </button>
                                 <a href="/truk" class="btn btn-secondary">Kembali</i>
                                 </a>
                             </div>
@@ -75,6 +80,16 @@
                 }
             });
         }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('formTruk');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnLoading = document.getElementById('btnLoading');
+
+        form.addEventListener('submit', function () {
+            btnSubmit.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+        });
     });
 </script>
     

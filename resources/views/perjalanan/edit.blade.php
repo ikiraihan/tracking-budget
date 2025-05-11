@@ -19,7 +19,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="tanggal_berangkat" class="form-label" required>Tanggal Keberangkatan</label>
-                                    <input type="date" class="form-control" name="tanggal_berangkat" id="tanggal_berangkat" value="{{ old('tanggal_berangkat', $perjalanan->tanggal_berangkat) }}">
+                                    <input type="date" class="form-control" name="tanggal_berangkat" id="tanggal_berangkat" value="{{ old('tanggal_berangkat', $perjalanan->tanggal_berangkat) }}"required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label" for="uang_kembali" required>Uang Kembali</label>
@@ -29,7 +29,7 @@
                                 <div class="col-md-6 mb-2">
                                     <label for="photo_struk_kembali" class="form-label">Foto Struk Kembali <span style="color: red;">*</span></label>
                                     <input type="file" class="form-control @error('photo_struk_kembali') is-invalid @enderror" 
-                                        id="photo_struk_kembali" name="photo_struk_kembali" accept=".jpg,.jpeg,.png">                                    
+                                        id="photo_struk_kembali" name="photo_struk_kembali" accept="image/*" required>                                   
                                     @error('photo_struk_kembali')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

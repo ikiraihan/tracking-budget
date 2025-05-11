@@ -114,7 +114,7 @@ class TrukController extends Controller
             $truk = new Truk();
             $truk->no_polisi = $request->no_polisi;
             $truk->nama = $request->nama;
-            $truk->is_active = $request->is_active;
+            $truk->is_active = $request->is_active ?? true;
 
             if ($request->hasFile('photo')) {
     

@@ -1675,8 +1675,15 @@
                     opens: 'right',
                     showDropdowns: true,
                     autoUpdateInput: false,
-                    startDate: moment('{{ $start }}'),
-                    endDate: moment('{{ $end }}')
+                    startDate: moment('{{ $start }}', 'YYYY-MM-DD'),
+                    endDate: moment('{{ $end }}', 'YYYY-MM-DD')
+                });
+
+                $('#daterange').on('show.daterangepicker', function(ev, picker) {
+                    picker.container.find('.calendar.right').hide();
+                    picker.container.find('.calendar.left').css('float', 'none');
+                    picker.container.find('.daterangepicker').css('width', 'auto');
+                    $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
                 });
 
                 $('#daterange').on('apply.daterangepicker', function(ev, picker) {
@@ -1685,12 +1692,6 @@
 
                 $('#daterange').on('cancel.daterangepicker', function() {
                     $(this).val('');
-                });
-
-                $('#daterange').on('show.daterangepicker', function(ev, picker) {
-                    picker.container.find('.calendar.right').hide();
-                    picker.container.find('.calendar.left').css('float', 'none');
-                    picker.container.find('.daterangepicker').css('width', 'auto');
                 });
             }
 
