@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use App\Models\Perjalanan;
+
 class Functions
 {
     public static function generateRandomColorsTruk($count) {
@@ -39,5 +41,77 @@ class Functions
         }
     
         return $colors;
+    }
+
+    public static function generateSetoranMuatan($muatan) {
+    
+        $muatan = strtolower($muatan);
+        switch($muatan){
+            case'cnj':
+                $setoran = config('constants.setoran_muatan.CNJ');
+                break;
+            case'stj':
+                $setoran = config('constants.setoran_muatan.STJ');
+                break;
+            default:
+                $setoran = config('constants.setoran_muatan.lainnya');
+                break;
+        }
+        return $setoran;
+    }
+    public static function generateSubsidiTol($muatan) {
+        $muatan = strtolower($muatan);
+        switch($muatan){
+            case'cnj':
+                $setoran = config('constants.subsidi_tol.CNJ');
+                break;
+            case'stj':
+                $setoran = config('constants.subsidi_tol.STJ');
+                break;
+            default:
+                $setoran = config('constants.subsidi_tol.lainnya');
+                break;
+        }
+        return $setoran;
+    }
+    public static function generateColorStatus($statusSlug) {
+    
+        switch($statusSlug){
+            case'dalam-perjalanan':
+                $color = "bg-primary";
+                break;
+            case'proses-reimburse':
+                $color = "bg-orange";
+                break;
+            case'proses-pembayaran':
+                $color = "bg-teal";
+                break;
+            case'selesai':
+                $color = "bg-success";
+                break;
+            default:
+                $color = "bg-success";
+                break;
+        }
+        return $color;
+    }
+
+    public static function generateMuatanMerge() 
+    {
+        $semuaMuatan = Perjalanan::pluck('muatan')->toArray();
+
+        $semuaMuatanArray = [];
+        foreach ($semuaMuatan as $item) {
+            $parts = explode(',', $item);
+            $trimmed = array_map('trim', $parts);
+            $semuaMuatanArray = array_merge($semuaMuatanArray, $trimmed);
+        }
+        $muatanDefault = config('constants.muatan');
+        $customMuatan = array_diff($semuaMuatanArray, $muatanDefault);
+        $muatanCustomUnique = array_values(array_unique($customMuatan));
+        $muatanMerged = array_values(array_unique(array_merge($muatanDefault, $muatanCustomUnique)));
+
+        return $muatanMerged;
+
     }
 }

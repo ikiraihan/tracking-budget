@@ -11,6 +11,33 @@ class CreateLogisticsTables extends Migration
      */
     public function up(): void
     {
+        Schema::create('kota_tujuans', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama')->nullable();
+            $table->string('slug')->nullable()->unique();
+            $table->bigInteger('uang_setoran_tambahan')->default(0);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('jalurs', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama')->nullable();
+            $table->string('slug')->nullable()->unique();
+            $table->bigInteger('uang_pengembalian_tol')->default(0);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('statuses', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama')->nullable();
+            $table->string('slug')->nullable()->unique();
+            $table->timestamps();
+            $table->softDeletes();
+        });
         // TRUK table
         Schema::create('truk', function (Blueprint $table) {
             $table->id();
@@ -49,18 +76,41 @@ class CreateLogisticsTables extends Migration
             $table->string('hash')->unique();
             $table->foreignId('truk_id')->nullable()->constrained('truk')->onDelete('cascade');
             $table->foreignId('supir_id')->nullable()->constrained('supir')->onDelete('cascade');
+            $table->string('jalur_slug')->nullable();
+            $table->foreign('jalur_slug')->references('slug')->on('jalurs')->onDelete('cascade');
+            $table->string('kota_tujuan_slug')->nullable();
+            $table->foreign('kota_tujuan_slug')->references('slug')->on('kota_tujuans')->onDelete('cascade');
             $table->date('tanggal_berangkat')->nullable();
             $table->date('tanggal_kembali')->nullable();
-            $table->enum('jalur',['full-tol','setengah-tol','bawah'])->nullable();
+            $table->string('muatan')->nullable();
+            // $table->enum('jalur',['full-tol','setengah-tol','bawah'])->nullable();
             $table->bigInteger('uang_pengembalian_tol')->default(0);
             $table->bigInteger('uang_subsidi_tol')->default(0);
             $table->bigInteger('uang_kembali')->default(0);
             $table->bigInteger('uang_setoran')->default(0);
+            $table->bigInteger('uang_setoran_tambahan')->default(0);
             $table->string('path_struk_kembali')->nullable();
+            $table->string('path_bukti_pembayaran')->nullable();
+            $table->string('status_slug')->nullable();
+            $table->foreign('status_slug')->references('slug')->on('statuses')->onDelete('cascade');
             $table->boolean('is_done')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
+
+        Schema::create('pengeluaran', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('perjalanan_id')->nullable()->constrained('perjalanan')->onDelete('cascade');
+            $table->foreignId('truk_id')->nullable()->constrained('truk')->onDelete('cascade');
+            $table->foreignId('supir_id')->nullable()->constrained('supir')->onDelete('cascade');
+            $table->string('nama')->nullable();
+            $table->text('deskripsi')->nullable();
+            $table->bigInteger('uang_pengeluaran')->default(0);
+            $table->string('path_photo')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
 
         // PROVINSI table
         // Schema::create('provinsi', function (Blueprint $table) {

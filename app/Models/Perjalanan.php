@@ -17,14 +17,19 @@ class Perjalanan extends Model
         'hash',
         'truk_id',
         'supir_id',
+        'jalur_slug',
+        'kota_tujuan_slug',
         'tanggal_berangkat',
         'tanggal_kembali',
         'uang_pengembalian_tol',
-        'jalur',
+        'muatan',
         'uang_subsidi_tol',
         'uang_kembali',
         'uang_setoran',
+        'uang_setoran_tambahan',
         'path_struk_kembali',
+        'path_bukti_pembayaran',
+        'status_slug',
         'is_done',
     ];
 
@@ -56,5 +61,10 @@ class Perjalanan extends Model
     public function returnKota()
     {
         return $this->belongsTo(Kota::class, 'return_kota_id');
+    }
+
+    public function pengeluarans()
+    {
+        return $this->hasMany(Pengeluaran::class);
     }
 }

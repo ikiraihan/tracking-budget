@@ -116,9 +116,9 @@
                                 <div class="col-md-9">
                                     <input 
                                         type="text" 
-                                        class="form-control {{ $perjalanan->is_done == 1 ? 'bg-success text-white' : 'bg-danger text-white' }}"  
+                                        class="form-control {{ $perjalanan->status_color }} text-white"  
                                         placeholder="Status Perjalanan" 
-                                        value="{{ $perjalanan->is_done == 1 ? 'Selesai' : 'Belum Selesai' }}" 
+                                        value="{{ $perjalanan->status_nama }}" 
                                         readonly
                                     >
                                 </div>
@@ -150,17 +150,7 @@
                                     <label class="form-label fw-medium">Jalur</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control bg-light" 
-                                    @if($perjalanan->jalur == 'full-tol')
-                                        value="Full Tol" 
-                                    @elseif($perjalanan->jalur == 'setengah-tol')
-                                        value="Setengah Tol" 
-                                    @elseif($perjalanan->jalur == 'bawah')
-                                        value="Bawah" 
-                                    @else
-                                        value="-"
-                                    @endif
-                                    readonly>
+                                    <input type="text" class="form-control bg-light" value="{{ $perjalanan->jalur_nama ?? '-'}}"readonly>
                                 </div>
                             </div>
                         </div>
@@ -197,7 +187,38 @@
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-medium">File Struk Kembali</label>
+                                    <label class="form-label fw-medium">Sisa</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->sisa ?? 0, 0, ',', '.') }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Setoran</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->total_uang_setoran ?? 0, 0, ',', '.') }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Bayaran Supir</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->bayaran_supir ?? 0, 0, ',', '.') }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 main-content-label text-center">File Pendukung</div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Struk Kembali</label>
                                 </div>
                                 <div class="col-md-9">
                                     @if ($perjalanan->path_struk_kembali)
@@ -213,30 +234,16 @@
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-medium">Sisa</label>
+                                    <label class="form-label fw-medium">Bukti Transfer</label>
                                 </div>
                                 <div class="col-md-9">
-                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->sisa ?? 0, 0, ',', '.') }}" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="form-label fw-medium">Setoran</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->uang_setoran ?? 0, 0, ',', '.') }}" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="form-label fw-medium">Bayaran Supir</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control bg-light"  placeholder="Nick Name" value="Rp. {{ number_format($perjalanan->bayaran_supir ?? 0, 0, ',', '.') }}" readonly>
+                                    @if ($perjalanan->path_bukti_pembayaran)
+                                    <a href="{{ asset($perjalanan->path_bukti_pembayaran) }}" target="_blank" style="color: blue; text-decoration: underline;">
+                                        Lihat File
+                                    </a>
+                                    @else
+                                        -
+                                    @endif                          
                                 </div>
                             </div>
                         </div>
@@ -303,6 +310,47 @@
                                 </div>
                             </div>
                         </div>
+                        @if($perjalanan->pengeluaran->isNotEmpty())
+                            <div class="mt-3 main-content-label text-center">Pengeluaran</div>
+                        @endif
+                        @foreach($perjalanan->pengeluaran as $pengeluaran)
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Nama Pengeluaran</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light" value="{{ $pengeluaran->nama ?? '-'}}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Jumlah Pengeluaran</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light" value="Rp. {{ number_format($pengeluaran->uang_pengeluaran ?? 0, 0, ',', '.') }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Bukti Pembayaran</label>
+                                </div>
+                                <div class="col-md-9">
+                                    @if ($pengeluaran->path_photo)
+                                    <a href="{{ asset($pengeluaran->path_photo) }}" target="_blank" style="color: blue; text-decoration: underline;">
+                                        Lihat File
+                                    </a>
+                                    @else
+                                        -
+                                    @endif                          
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </form>
                 </div>
             </div>                     

@@ -153,11 +153,11 @@
                                     <td>{{ $item->tanggal_berangkat_format ?? 'N/A' }} - {{ $item->tanggal_kembali_format ?? 'N/A' }}</td>
                                     <td>{{ $item->truk_nama ?? '-' }}</td>
                                     <td>
-                                        @if ($item->jalur == 'full-tol')
+                                        @if ($item->jalur_slug == 'full-tol')
                                             Full Tol
-                                        @elseif ($item->jalur == 'setengah-tol')
+                                        @elseif ($item->jalur_slug == 'setengah-tol')
                                             Setengah Tol
-                                        @elseif ($item->jalur == 'bawah')
+                                        @elseif ($item->jalur_slug == 'bawah')
                                             Bawah
                                         @else
                                             -
@@ -173,17 +173,13 @@
                                         @endif
                                     </td>
                                     <td>Rp. {{ number_format($item->uang_kembali ?? 0, 0, ',', '.') }}</td>
-                                    <td>Rp. {{ number_format($item->uang_setoran ?? 0, 0, ',', '.') }}</td>
+                                    <td>Rp. {{ number_format($item->total_uang_setoran ?? 0, 0, ',', '.') }}</td>
                                     <td>Rp. {{ number_format($item->bayaran_supir ?? 0, 0, ',', '.') }}</td>
                                     {{-- <th class="{{ ($item->total ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
                                         Rp. {{ number_format($item->total ?? 0, 0, ',', '.') }}
                                     </th> --}}
                                     <td>
-                                        @if ($item->is_done)
-                                            <span class="badge bg-success ">Selesai</span>
-                                        @else
-                                            <span class="badge bg-danger">Belum Selesai</span>
-                                        @endif
+                                        <span class="badge {{ $item->status_color }}">{{ $item->status_nama }}</span>
                                     </td>
                                 </tr>
                             @endforeach
@@ -255,12 +251,15 @@
                     @endif
                     <div class="mb-3">
                         <label class="form-label">Status</label>
-                        <select class="form-control form-control-sm @error('is_done') is-invalid @enderror" name="is_done" id="is_done">
-                            <option value="" {{ old('is_done', $isDone) === null ? 'selected' : '' }}>-- Semua Status --</option>
-                            <option value="1" {{ old('is_done', $isDone) === '1' ? 'selected' : '' }}>Selesai</option>
-                            <option value="0" {{ old('is_done', $isDone) === '0' ? 'selected' : '' }}>Belum Selesai</option>
+                        <select class="form-control form-control-sm @error('status_slug') is-invalid @enderror" name="status_slug" id="status_slug">
+                            <option value="" {{ old('status_slug', $statusSlug) === null ? 'selected' : '' }}>-- Semua Status --</option>
+                            @foreach($statuses as $status)
+                                <option value="{{ $status->slug }}" {{ old('status_slug', $statusSlug ?? '') == $status->slug ? 'selected' : '' }}>
+                                    {{ $status->nama }}
+                                </option>
+                            @endforeach
                         </select>
-                        @error('is_done')
+                        @error('status_slug')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

@@ -36,7 +36,7 @@
                     </li>
                     @endif
                     <!-- Start::slide -->
-                    @if(Auth::check() && Auth::user()->role_id === 3)
+                    @if(Auth::check() && in_array(Auth::user()->role_id,[3]))
                         <li class="slide__category"><span class="category-name">Form</span></li>
                         <li class="slide">
                             <a href="/perjalanan/form"

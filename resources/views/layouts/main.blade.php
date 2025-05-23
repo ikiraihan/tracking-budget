@@ -82,6 +82,18 @@
 
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <style>
+        /* Sembunyikan select secara default untuk mencegah FOUC */
+        #muatan {
+            visibility: hidden;
+        }
+        /* Tampilkan setelah inisialisasi */
+        #muatan.ts-initialized {
+            visibility: visible;
+        }
+    </style>
 </head>
 
 <body>
@@ -1597,7 +1609,7 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const targetInputs = ["uang_pengembalian_tol", "uang_subsidi_tol", "uang_kembali","uang_setoran"];
+            const targetInputs = ["uang_pengembalian_tol", "uang_subsidi_tol", "uang_kembali","uang_setoran","uang_pengeluaran"];
         
             function formatRupiah(angka) {
                 return angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -1702,7 +1714,7 @@
                 var dateRange = $('#daterange').val();
                 var trukId = $('#truk_id').val();
                 var supirId = $('#supir_id').val();
-                var isDone = $('#is_done').val();
+                var statusSlug = $('#status_slug').val();
 
                 if (dateRange && dateRange !== '') {
                     params.push('date_range=' + encodeURIComponent(dateRange));
@@ -1713,8 +1725,8 @@
                 if (supirId && supirId !== '') {
                     params.push('supir_id=' + encodeURIComponent(supirId));
                 }
-                if (isDone && isDone !== '') {
-                    params.push('is_done=' + encodeURIComponent(isDone));
+                if (statusSlug && statusSlug !== '') {
+                    params.push('status_slug=' + encodeURIComponent(statusSlug));
                 }
 
                 var url = form.attr('action');
@@ -1729,6 +1741,7 @@
                 $('#truk_id').val('');
                 $('#supir_id').val('');
                 $('#is_done').val('');
+                $('#status_slug').val('');
                 if ($('#daterange').data('daterangepicker')) {
                     $('#daterange').data('daterangepicker').setStartDate(moment());
                     $('#daterange').data('daterangepicker').setEndDate(moment());
@@ -1738,7 +1751,7 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const fileInputs = ['photo_diri', 'photo_ktp', 'photo_sim','photo_struk_kembali'];
+            const fileInputs = ['photo_diri', 'photo_ktp', 'photo_sim','photo_struk_kembali','path_photo_penjualan'];
         
             fileInputs.forEach(function(inputId) {
                 const input = document.getElementById(inputId);
@@ -1784,6 +1797,68 @@
             });
         });
         </script>   
+        <script>
+        // const constants = {
+        //     setoran_muatan: @json(config('constants.setoran_muatan'))
+        // };
+
+        // Inisialisasi Tom Select
+        const muatanSelect = new TomSelect('#muatan', {
+            create: true,
+            createOnBlur: true,
+            placeholder: 'Pilih atau Ketikkan Muatan',
+            maxItems: 1,
+            allowEmptyOption: true,
+            onInitialize: function() {
+                const defaultValue = '{{ old('muatan', $muatanOld ?? '') }}';
+                if (defaultValue) {
+                    this.setValue(defaultValue);
+                }else{
+                     this.setValue('');
+                }
+                this.wrapper.classList.add('ts-initialized');
+            },
+            onChange: function(value) {
+                const uangKembali = document.getElementById('uang_kembali');
+                // const uangSubsidiTol = document.getElementById('uang_subsidi_tol');
+                // const uangSetoran = document.getElementById('uang_setoran');
+
+                uangKembali.classList.remove('bg-light');
+                // uangSubsidiTol.classList.remove('bg-light');
+                // uangSetoran.classList.remove('bg-light');
+
+                if (value == 'CNJ') {
+                    uangKembali.value = '0';
+                    uangKembali.readOnly = true;
+                    uangKembali.classList.add('bg-light');
+                    uangKembali.required = false;
+                    // uangSubsidiTol.value = 0;
+                    // uangSubsidiTol.readOnly = true;
+                    // uangSubsidiTol.classList.add('bg-light');
+                    // uangSetoran.value = constants.setoran_muatan.CNJ.toLocaleString('id-ID');
+                    // uangSetoran.readOnly = true;
+                    // uangSetoran.classList.add('bg-light'); 
+                    formStrukKembali.style.display = 'none';
+                    document.getElementById('photo_struk_kembali').required = false;
+                } else {
+                    const uangKembaliValue = @json(old('uang_kembali', $uangKembaliOld ?? ''));
+                    uangKembali.value = uangKembaliValue || '';
+                    uangKembali.readOnly = false;
+                    uangKembali.required = true;
+                    // uangSubsidiTol.value = 350000;
+                    // uangSubsidiTol.readOnly = true;
+                    // uangSubsidiTol.classList.add('bg-light');
+                    // uangSetoran.value = constants.setoran_muatan.STJ.toLocaleString('id-ID');
+                    // uangSetoran.readOnly = true;
+                    // uangSetoran.classList.add('bg-light');
+                    formStrukKembali.style.display = 'block';
+                    document.getElementById('photo_struk_kembali').required = false;
+                }
+
+                this.element.value = value;
+            }
+        });
+        </script>
 
 
     @yield('script')

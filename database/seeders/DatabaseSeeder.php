@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             // ProvinsiSeeder::class,
             // KotaSeeder::class,
+            JalurSeeder::class,
+            KotaTujuanSeeder::class,
+            StatusSeeder::class,
             TrukSeeder::class,
             SupirSeeder::class,
         ]);
