@@ -93,6 +93,30 @@
         #muatan.ts-initialized {
             visibility: visible;
         }
+        .dropzone {
+            border: 2px dashed #0d6efd;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropzone.dragover {
+            background-color: #e6f0ff;
+        }
+
+        .dropzone input[type="file"] {
+            display: none;
+        }
+
+        #previewImage {
+            max-width: 100%;
+            max-height: 250px;
+            margin-top: 15px;
+            display: none;
+            border-radius: 8px;
+        }
     </style>
 </head>
 
@@ -1751,7 +1775,7 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const fileInputs = ['photo_diri', 'photo_ktp', 'photo_sim','photo_struk_kembali','path_photo_penjualan'];
+            const fileInputs = ['photo_diri', 'photo_ktp', 'photo_sim','photo_struk_kembali','path_photo_penjualan',"bukti_pembayaran"];
         
             fileInputs.forEach(function(inputId) {
                 const input = document.getElementById(inputId);
@@ -1859,6 +1883,93 @@
             }
         });
         </script>
+        {{-- <script>
+            const dropzone = document.getElementById('dropzone');
+            const formFile = document.getElementById('formFile');
+            const previewImage = document.getElementById('previewImage');
+            const dataIdInput = document.getElementById('dataIdInput');
+
+            // Set ID saat tombol dibuka
+            document.querySelectorAll('.open-verifikasi-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const id = button.getAttribute('data-id');
+                    dataIdInput.value = id;
+                    formFile.value = '';
+                    previewImage.style.display = 'none';
+                    previewImage.src = '#';
+                });
+            });
+
+            // Highlight saat drag over
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('dragover');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('dragover');
+                });
+            });
+
+            // Handle drop file
+            dropzone.addEventListener('drop', e => {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    formFile.files = files;
+
+                    // Trigger change manually
+                    const event = new Event('change', { bubbles: true });
+                    formFile.dispatchEvent(event);
+                }
+            });
+
+            // Handle preview dari input file
+            formFile.addEventListener('change', () => {
+                const file = formFile.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Submit via PUT
+            document.getElementById('verifikasiForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const id = dataIdInput.value;
+                const formData = new FormData();
+                const file = formFile.files[0];
+
+                if (!file) {
+                    alert("Pilih file terlebih dahulu.");
+                    return;
+                }
+
+                formData.append('bukti_pembayaran', file);
+
+                const response = await fetch(`perjalanan/pembayaran/${id}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Upload berhasil!');
+                    location.reload();
+                } else {
+                    alert('Upload gagal.');
+                }
+            });
+        </script> --}}
 
 
     @yield('script')

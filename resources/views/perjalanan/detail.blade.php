@@ -123,7 +123,17 @@
                                     >
                                 </div>
                             </div>
-                        </div>                        
+                        </div>  
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Muatan</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light" value="{{ $perjalanan->muatan ?? '-'}}"readonly>
+                                </div>
+                            </div>
+                        </div>                      
                         <div class="form-group mb-3">
                             <div class="row">
                                 <div class="col-md-3">
@@ -151,6 +161,16 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control bg-light" value="{{ $perjalanan->jalur_nama ?? '-'}}"readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Tujuan Bongkar Akhir</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light" value="{{ $perjalanan->kota_tujuan_nama ?? '-'}}"readonly>
                                 </div>
                             </div>
                         </div>

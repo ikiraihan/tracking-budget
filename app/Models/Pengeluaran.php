@@ -25,4 +25,8 @@ class Pengeluaran extends Model
     public function perjalanan() {
         return $this->belongsTo(Perjalanan::class);
     }
+
+    public function truk() {
+        return $this->belongsTo(Perjalanan::class);
+    }
 }

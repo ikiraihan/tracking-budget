@@ -400,6 +400,72 @@ class PerjalananController extends Controller
         }
     }
 
+    public function verifikasiData($id)
+    {
+        try {
+            $perjalanan = Perjalanan::findOrFail($id);
+            $perjalanan->update([
+                'status_slug' => 'proses-pembayaran',
+            ]);
+
+            //return redirect()->route('perjalanan.index')->with('success', 'Data perjalanan berhasil dihapus.');
+            return response()->json(['message' => 'Data berhasil diverifikasi.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Gagal diverifikasi:' . $e->getMessage()]);
+            //return back()->with('error', 'Gagal menghapus data perjalanan: ' . $e->getMessage());
+        }
+    } 
+
+    public function tolakData($id)
+    {
+        try {
+            $perjalanan = Perjalanan::findOrFail($id);
+            $perjalanan->update([
+                // 'jalur_slug' => null,
+                // 'kota_tujuan_slug' => null,
+                // 'tanggal_kembali' => null,
+                // 'uang_pengembalian_tol' => 0,
+                // 'uang_setoran_tambahan' => 0,
+                'status_slug' => 'dalam-perjalanan',
+                // 'is_done' => false,
+            ]);
+
+            //return redirect()->route('perjalanan.index')->with('success', 'Data perjalanan berhasil dihapus.');
+            return response()->json(['message' => 'Data berhasil diverifikasi.']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Gagal diverifikasi:' . $e->getMessage()]);
+            //return back()->with('error', 'Gagal menghapus data perjalanan: ' . $e->getMessage());
+        }
+    } 
+
+    public function pembayaran(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'bukti_pembayaran' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+            ]);
+            $perjalanan = Perjalanan::findOrFail($id);
+
+            if ($request->hasFile('bukti_pembayaran') && $request->file('bukti_pembayaran')->isValid()) {
+                $file = $request->file('bukti_pembayaran');
+                $filename = time() . '_struk_' . $file->getClientOriginalName();
+                $destination = public_path('/uploads/perjalanan/struk');
+                if (!file_exists($destination)) mkdir($destination, 0755, true);
+                $file->move($destination, $filename);
+                $path = '/uploads/perjalanan/struk/' . $filename;
+            }
+
+            $perjalanan->update([
+                'path_bukti_pembayaran' => $path,
+                'status_slug' => 'selesai',
+            ]);
+
+            return redirect()->route('perjalanan.index')->with('success', 'Data perjalanan berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
+    }
+
     public function delete($id)
     {
         try {

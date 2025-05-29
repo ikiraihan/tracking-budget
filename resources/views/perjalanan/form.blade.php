@@ -101,7 +101,7 @@
     // }
 
     document.addEventListener('DOMContentLoaded', function () {
-        toggleForm(); // pastikan kondisi awal sesuai checkbox
+        // toggleForm(); // pastikan kondisi awal sesuai checkbox
 
         const form = document.getElementById('formPerjalanan');
         const btnSubmit = document.getElementById('btnSubmit');

@@ -18,7 +18,7 @@ class StatusSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nama' => 'Proses Reimburse',
+                'nama' => 'Verifikasi Data',
                 'slug' => Str::slug('proses-reimburse'),
                 'created_at' => now(),
                 'updated_at' => now(),

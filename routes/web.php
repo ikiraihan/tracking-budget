@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KotaController;
+use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\PerjalananController;
 use App\Http\Controllers\SupirController;
 use App\Http\Controllers\TrukController;
@@ -46,7 +47,7 @@ Route::middleware(['auth', 'role:1'])->group(function () {//admin
 });
 
 Route::middleware(['auth', 'role:1,2'])->group(function () { //admin dan owner
-    Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard.dashboard');
+    Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::get('truk', [TrukController::class, 'index'])->name('truk.index');
     Route::get('truk/detail/{id}', [TrukController::class, 'detail'])->name('truk.detail');
@@ -58,6 +59,10 @@ Route::middleware(['auth', 'role:1,2'])->group(function () { //admin dan owner
 
     Route::get('supir', [SupirController::class, 'index'])->name('supir.index');
     Route::get('supir/detail/{id}', [SupirController::class, 'detail'])->name('supir.detail');
+
+    Route::get('pengeluaran', [PengeluaranController::class, 'index'])->name('pengeluaran.index');
+    Route::get('/pengeluaran/show/{truk_id}', [PengeluaranController::class, 'show']);
+
 });
 
 Route::middleware(['auth', 'role:1,2,3'])->group(function () { //admin , owner, dan supir
@@ -67,6 +72,9 @@ Route::middleware(['auth', 'role:1,2,3'])->group(function () { //admin , owner, 
     Route::get('perjalanan/detail/{id}', [PerjalananController::class, 'detail'])->name('perjalanan.detail');
     Route::get('perjalanan/edit/{id}', [PerjalananController::class, 'edit'])->name('perjalanan.edit');
     Route::put('perjalanan/update/{id}', [PerjalananController::class, 'update'])->name('perjalanan.update');
+    Route::put('perjalanan/verifikasi-data/{id}', [PerjalananController::class, 'verifikasiData'])->name('perjalanan.verifikasi_data');
+    Route::put('perjalanan/tolak-data/{id}', [PerjalananController::class, 'tolakData'])->name('perjalanan.tolak_data');
+    Route::put('perjalanan/pembayaran/{id}', [PerjalananController::class, 'pembayaran'])->name('perjalanan.pembayaran');
     Route::delete('perjalanan/delete/{id}', [PerjalananController::class, 'delete'])->name('perjalanan.delete');
 
 });

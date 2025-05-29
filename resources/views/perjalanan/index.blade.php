@@ -133,20 +133,59 @@
                                             <a href="/perjalanan/detail/{{ $item->id }}"class="btn btn-teal-transparent showPerjalanan">
                                                 <i class="fa-solid fa-eye"></i>
                                             </a>
-                                            <a href="/perjalanan/edit/{{ $item->id }}" class="btn btn-warning-transparent">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="/perjalanan/delete/{{ $item->id }}" method="POST" class="d-inline btn-form">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button 
-                                                    type="submit" 
-                                                    class="btn btn-danger-transparent"
-                                                    onclick="return confirm('Hapus Data?')"
-                                                    data-id="{{ $item->id ?? '' }}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            @if(in_array($role,['owner']))
+                                                @if($item->status_slug == 'proses-reimburse')
+                                                    <button class="btn btn-success-transparent" data-id="{{ $item->id }}" data-bs-toggle="modal" data-bs-target="#verifikasiReimburse">
+                                                        Verifikasi?
+                                                    </button>
+                                                {{-- @else
+                                                    <a href="/perjalanan/edit/{{ $item->id }}" class="btn btn-warning-transparent">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form action="/perjalanan/delete/{{ $item->id } }" method="POST" class="d-inline btn-form">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button 
+                                                            type="submit" 
+                                                            class="btn btn-danger-transparent"
+                                                            onclick="return confirm('Hapus Data?')"
+                                                            data-id="{{ $item->id ?? '' }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form> --}}
+                                                @endif
+                                            @elseif(in_array($role,['admin']))
+                                                @if($item->status_slug == 'proses-pembayaran')
+                                                    <button class="btn btn-success-transparent" data-id="{{ $item->id }}" data-bs-toggle="modal" data-bs-target="#verifikasiPembayaran">
+                                                        Verifikasi?
+                                                    </button>
+                                                {{-- @else
+                                                    <a href="/perjalanan/edit/{{ $item->id }}" class="btn btn-warning-transparent">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form action="/perjalanan/delete/{{ $item->id } }" method="POST" class="d-inline btn-form">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button 
+                                                            type="submit" 
+                                                            class="btn btn-danger-transparent"
+                                                            onclick="return confirm('Hapus Data?')"
+                                                            data-id="{{ $item->id ?? '' }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form> --}}
+                                                @endif
+                                            @else
+                                                @if($item->status_slug == 'dalam-perjalanan')
+                                                    <a href="/perjalanan/edit/{{ $item->id }}" class="btn btn-warning-transparent">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                {{-- @else
+                                                    <a class="btn btn-warning-transparent disabled" role="button" aria-disabled="true">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a> --}}
+                                                @endif
+                                            @endif
                                         </div>
                                     </td>
                                     <td>{{ $item->hash ?? '-' }}</td>
@@ -272,7 +311,140 @@
         </form>
     </div>
 </div>
+<div class="modal fade" id="verifikasiReimburse" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Apakah Anda yakin ingin memverifikasi?</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <button type="button" class="btn btn-success me-2" id="btn-verifikasi" data-id="{{ $item->id }}">
+                    Ya
+                </button>
+                <button type="button" class="btn btn-danger me-2" id="btn-tolak" data-id="{{ $item->id }}">
+                    Tidak
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="verifikasiPembayaran" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="verifikasiForm" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="_method" value="PUT">
+                
+                <div class="modal-header">
+                    <h6 class="modal-title">Verifikasi Pembayaran</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body text-center">
+                    <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*" class="form-control form-control-lg mb-3">
+                    <div class="mt-2">
+                        <img id="preview-bukti_pembayaran" 
+                        src="#" 
+                        alt="Preview Bukti Pembayaran" 
+                        class="img-thumbnail" 
+                        width="150"
+                        style="display: none;">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Kirim</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('verifikasiReimburse');
+    const btnVerifikasi = document.getElementById('btn-verifikasi');
+    const btnTolak = document.getElementById('btn-tolak');
+
+    // Tangkap semua tombol yang membuka modal
+    const triggerButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#verifikasiReimburse"]');
+
+    triggerButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.dataset.id;
+
+            // Masukkan id ke tombol modal
+            btnVerifikasi.setAttribute('data-id', id);
+            btnTolak.setAttribute('data-id', id);
+        });
+    });
+
+    // Aksi tombol "Ya"
+    btnVerifikasi.addEventListener('click', function () {
+        const id = this.dataset.id;
+
+        fetch(`/perjalanan/verifikasi-data/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Gagal memverifikasi.');
+            return response.text();
+        })
+        .then(() => {
+            Swal.fire('Berhasil!', 'Data berhasil diverifikasi.', 'success')
+                .then(() => location.reload());
+        })
+        .catch(error => {
+            Swal.fire('Gagal!', error.message, 'error');
+        });
+    });
+
+    // Aksi tombol "Tidak"
+    btnTolak.addEventListener('click', function () {
+        const id = this.dataset.id;
+
+        fetch(`/perjalanan/tolak-data/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Gagal menolak data.');
+            return response.text();
+        })
+        .then(() => {
+            Swal.fire('Ditolak!', 'Data berhasil ditolak.', 'success')
+                .then(() => location.reload());
+        })
+        .catch(error => {
+            Swal.fire('Gagal!', error.message, 'error');
+        });
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('verifikasiPembayaran');
+    modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const form = document.getElementById('verifikasiForm');
+        form.setAttribute('action', `/perjalanan/pembayaran/${id}`);
+    });
+});
+</script>
+
 {{-- @push('scripts')
 <script>
     $(document).ready(function() {
