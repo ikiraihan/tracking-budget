@@ -16,6 +16,9 @@ class DashboardController extends Controller
     }
     public function dashboard(Request $request)
     {
+        $user = Auth::user();
+        $role = $user && $user->role_id ? $user->role->slug : null;
+
         $request->validate([
             'date_range' => 'nullable|string',
         ]);
@@ -36,13 +39,19 @@ class DashboardController extends Controller
     
         $graphValuePerTruk = $this->dashboardService->graphValuePerTruk($graphDTO);
         $graphValuePerStatus = $this->dashboardService->graphValuePerStatus($graphDTO);
+        $countVerifikasiDataPerjalanan = $this->dashboardService->countVerifikasiDataPerjalanan();
+        $countVerifikasiPembayaranPerjalanan = $this->dashboardService->countVerifikasiPembayaranPerjalanan();
+
 
         $data = [
             'title' => 'Dashboard Absensi',
+            'role' =>$role,
             'arr_year' => $arrYear,
             'default_range' => $startDateRange . ' to ' . $endDateRange,
             'graphValuePerTruk' => $graphValuePerTruk,
             'graphValuePerStatus' => $graphValuePerStatus,
+            'countVerifikasiDataPerjalanan' => $countVerifikasiDataPerjalanan,
+            'countVerifikasiPembayaranPerjalanan' => $countVerifikasiPembayaranPerjalanan,
         ];
 
         return view('dashboard', $data);

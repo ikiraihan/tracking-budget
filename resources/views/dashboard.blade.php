@@ -1,6 +1,22 @@
 @extends('layouts.main')
 
 @section('content')
+<style>
+.blink {
+    animation: blink-soft 2s ease-in-out infinite;
+    /* color: red; */
+}
+
+@keyframes blink-soft {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.2;
+    }
+}
+
+</style>
 <div class="container-fluid">
     <!-- Page Header -->
     <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
@@ -8,6 +24,49 @@
             <h4 class="mb-0">Dashboard</h4>
             {{-- <p class="mb-0 text-muted">Sales monitoring dashboard template.</p> --}}
         </div>
+    </div>
+    <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
+        @if($role == 'owner')
+        <div class="col-sm-10 col-lg-6 col-xl-3">
+            <div class="card card-img-holder">
+                <div class="card-body list-icons p-0">
+                    <div class="clearfix px-4 pt-3">
+                        <div class="text-center w-100">
+                            <p class="card-text mb-1">{{ $countVerifikasiDataPerjalanan['nama'] }}</p>
+                            <h4 class="{{ $countVerifikasiDataPerjalanan['count'] > 0 ? 'blink' : '' }}">
+                                {{ $countVerifikasiDataPerjalanan['count'] }}
+                            </h4>
+                        </div>
+                    </div>
+                    @if($countVerifikasiDataPerjalanan['count'] > 0)
+                        <div class="card-footer">
+                            <a href="/perjalanan?status_slug=proses-reimburse" class="btn btn-outline-success d-grid">Lihat Semua</a>
+                        </div>                    
+                    @endif
+                </div>
+            </div>
+        </div>
+        @elseif($role == 'admin')
+        <div class="col-sm-10 col-lg-6 col-xl-3">
+            <div class="card card-img-holder">
+                <div class="card-body list-icons p-0">
+                    <div class="clearfix px-4 pt-3">
+                        <div class="text-center w-100">
+                            <p class="card-text mb-1">{{ $countVerifikasiPembayaranPerjalanan['nama'] }}</p>
+                            <h4 class="{{ $countVerifikasiPembayaranPerjalanan['count'] > 0 ? 'blink' : '' }}">
+                                {{ $countVerifikasiPembayaranPerjalanan['count'] }}
+                            </h4>
+                        </div>
+                    </div>
+                    @if($countVerifikasiPembayaranPerjalanan['count'] > 0)
+                        <div class="card-footer">
+                            <a href="/perjalanan?status_slug=proses-pembayaran" class="btn btn-outline-success d-grid">Lihat Semua</a>
+                        </div>                    
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
         <form action="" method="GET" class="ms-auto" style="max-width: 600px;">
             <div class="row g-3 align-items-end">
                 <div class="col-md-8">

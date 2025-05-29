@@ -13,6 +13,29 @@ use App\Models\Truk;
 
 class DashboardService
 { 
+    public static function countVerifikasiDataPerjalanan()
+    {
+        $count = Perjalanan::where('status_slug','proses-reimburse')->count();
+    
+        $data = [
+            'nama'  => 'Membutuhkan Verifikasi Data',
+            'count' => $count,
+        ];
+    
+        return $data;
+    }  
+
+    public static function countVerifikasiPembayaranPerjalanan()
+    {
+        $count = Perjalanan::where('status_slug','proses-pembayaran')->count();
+    
+        $data = [
+            'nama'  => 'Membutuhkan Verifikasi Pembayaran',
+            'count' => $count,
+        ];
+    
+        return $data;
+    }  
     public static function graphValuePerTruk(GraphDTO $dto)
     {
         $startDate = $dto->startDate->startOfDay();
