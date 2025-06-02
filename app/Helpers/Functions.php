@@ -96,6 +96,28 @@ class Functions
         return $color;
     }
 
+    public static function generateColorStatusRGB($statusSlug)
+    {
+        switch($statusSlug){
+            case'dalam-perjalanan':
+                $color = "rgb(0,0,204)";
+                break;
+            case'proses-reimburse':
+                $color = "rgb(229, 115, 1)";
+                break;
+            case'proses-pembayaran':
+                $color = "rgba(0, 204, 204, 0.74)";
+                break;
+            case'selesai':
+                $color = "rgb(0,102,0)";
+                break;
+            default:
+                $color = "rgb(0,102,0)";
+                break;
+        }
+        return $color;
+    }
+
     public static function generateMuatanMerge() 
     {
         $semuaMuatan = Perjalanan::pluck('muatan')->toArray();

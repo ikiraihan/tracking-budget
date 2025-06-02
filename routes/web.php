@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KotaController;
+use App\Http\Controllers\KotaTujuanController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\PerjalananController;
 use App\Http\Controllers\SupirController;
@@ -63,6 +64,11 @@ Route::middleware(['auth', 'role:1,2'])->group(function () { //admin dan owner
     Route::get('pengeluaran', [PengeluaranController::class, 'index'])->name('pengeluaran.index');
     Route::get('/pengeluaran/show/{truk_id}', [PengeluaranController::class, 'show']);
 
+    Route::get('kota-tujuan', [KotaTujuanController::class, 'index'])->name('kota_tujuan.index');
+    Route::get('kota-tujuan/create', [KotaTujuanController::class, 'create'])->name('kota_tujuan.create');
+    Route::post('kota-tujuan/store', [KotaTujuanController::class, 'store'])->name('kota_tujuan.store');
+    Route::get('kota-tujuan/edit/{id}', [KotaTujuanController::class, 'edit'])->name('kota_tujuan.edit');
+    Route::put('kota-tujuan/update/{id}', [KotaTujuanController::class, 'update'])->name('kota_tujuan.update');
 });
 
 Route::middleware(['auth', 'role:1,2,3'])->group(function () { //admin , owner, dan supir

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KotaTujuan;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -13,9 +14,9 @@ class KotaTujuanController extends Controller
 {
     public function index()
     {
-        $users = User::get();
+        $kotaTujuans = KotaTujuan::get();
 
-        return view('user.index', compact('users'));
+        return view('kota_tujuan.index', compact('kotaTujuans'));
     }
 
     public function create()
@@ -50,9 +51,9 @@ class KotaTujuanController extends Controller
     
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        $kotaTujuan = KotaTujuan::findOrFail($id);
 
-        return view('user.edit', compact('user'));
+        return view('kota_tujuan.edit', compact('kotaTujuan'));
     }
 
     public function update(Request $request, $id)

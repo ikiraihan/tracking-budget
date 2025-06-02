@@ -319,12 +319,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
-                <button type="button" class="btn btn-success me-2" id="btn-verifikasi" data-id="{{ $item->id }}">
-                    Ya
-                </button>
-                <button type="button" class="btn btn-danger me-2" id="btn-tolak" data-id="{{ $item->id }}">
-                    Tidak
-                </button>
+                @if (!empty($item))
+                    <button type="button" class="btn btn-success me-2" id="btn-verifikasi" data-id="{{ $item->id }}">
+                        Ya
+                    </button>
+                    <button type="button" class="btn btn-danger me-2" id="btn-tolak" data-id="{{ $item->id }}">
+                        Tidak
+                    </button>
+                @endif
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Batal
                 </button>
@@ -345,7 +347,8 @@
                 </div>
 
                 <div class="modal-body text-center">
-                    <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*" class="form-control form-control-lg mb-3">
+                    <label class="form-label" for="uang_kembali"><span style="color: red;">*</span>Foto tidak boleh lebih dari 4 MB!</label>
+                    <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*" class="form-control form-control-lg mb-3" required>
                     <div class="mt-2">
                         <img id="preview-bukti_pembayaran" 
                         src="#" 

@@ -58,6 +58,8 @@
                             <span class="side-menu__label">Data Perjalanan</span>
                         </a>
                     </li>
+                    <!-- Start::slide__category -->
+                    @if(Auth::check() && in_array(Auth::user()->role_id,[1,2]))
                     <li class="slide">
                         <a href="/pengeluaran" class="side-menu__item {{ request()->routeIs('pengeluaran.index') ? 'active' : '' }}" >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="side-menu__icon bi bi-cash-coin" viewBox="0 0 16 16">
@@ -69,8 +71,6 @@
                             <span class="side-menu__label">Data Pengeluaran</span>
                         </a>
                     </li>
-                    <!-- Start::slide__category -->
-                    @if(Auth::check() && in_array(Auth::user()->role_id,[1,2]))
                     <li class="slide__category"><span class="category-name">Master</span></li>
                     <!-- End::slide__category -->
                     <li class="slide">

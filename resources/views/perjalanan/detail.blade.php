@@ -75,8 +75,8 @@
 
 <!-- Start::row-1 -->
 <div class="mt-1">
-    <a href="/perjalanan" class="btn btn-secondary">
-        <i class="bi bi-arrow-left">Kembali</i>
+    <a href="{{ url()->previous() }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Kembali
     </a>
 </div>
 <br>

@@ -442,7 +442,7 @@ class PerjalananController extends Controller
     {
         try {
             $request->validate([
-                'bukti_pembayaran' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
+                'bukti_pembayaran' => 'required|image|mimes:jpg,jpeg,png|max:4096',
             ]);
             $perjalanan = Perjalanan::findOrFail($id);
 
@@ -460,7 +460,7 @@ class PerjalananController extends Controller
                 'status_slug' => 'selesai',
             ]);
 
-            return redirect()->route('perjalanan.index')->with('success', 'Data perjalanan berhasil diperbarui!');
+            return redirect()->back()->with('success', 'Data perjalanan berhasil diperbarui!');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }

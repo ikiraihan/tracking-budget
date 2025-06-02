@@ -9,6 +9,7 @@ use App\Models\AbsensiHarian;
 use App\Models\HariLibur;
 use App\Models\KeteranganAbsensi;
 use App\Models\Perjalanan;
+use App\Models\Status;
 use App\Models\Truk;
 
 class DashboardService
@@ -68,15 +69,15 @@ class DashboardService
         $perjalanans = Perjalanan::whereBetween('tanggal_berangkat', [$startDate, $endDate])
             ->get();
     
-        $statuses = [0, 1];
+        $statuses = Status::get();
 
         // Map statuses to data
         $data = collect($statuses)->map(function ($status) use ($perjalanans) {
             return (object) [
-                'nama'  => $status ? 'Selesai' : 'Belum Selesai',
-                'slug'  => $status ? 'selesai' : 'belum-selesai',
-                'count' => $perjalanans->where('is_done', $status)->count(),
-                'color' => $status ? 'rgb(38,153,38)' : 'rgb(204,0,0)',
+                'nama'  => $status->nama,
+                'slug'  => $status->slug,
+                'count' => $perjalanans->where('status_slug', $status->slug)->count(),
+                'color' => Functions::generateColorStatusRGB($status->slug),
             ];
         });
 
