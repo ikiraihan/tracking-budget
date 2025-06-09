@@ -72,6 +72,7 @@
                         <div class="card-title fs-6" style="text-transform: none;">Nama : {{ $supir->nama  ?? '-'}}</div>
                         <div class="card-title fs-6" style="text-transform: none;">No. Telp: {{ $supir->telepon ?? '-'}}</div>
                         <div class="card-title fs-6" style="text-transform: none;">Alamat: {{ $supir->alamat ?? '-' }}</div>
+                        <div class="card-title fs-6" style="text-transform: none;">Info Rekening: {{ $supir->nama_bank ?? '' }} - {{ $supir->rekening }}</div>
                         <div class="card-title fs-6" style="text-transform: none;">
                             Truk yang Digunakan Sekarang: {{ $supir->truk && $supir->truk->nama ? $supir->truk->nama : '-' }} /
                             {{ $supir->truk && $supir->truk->no_polisi ? $supir->truk->no_polisi : '-' }}

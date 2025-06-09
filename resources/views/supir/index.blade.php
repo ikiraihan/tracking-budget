@@ -35,6 +35,7 @@
                                     <th>Nama</th>
                                     <th>No. Telp</th>
                                     <th>Alamat</th>
+                                    <th>Rekening</th>
                                     {{-- <th>No. KTP</th>
                                     <th style="width: 200px;">Foto KTP</th>
                                     <th>No. SIM</th>
@@ -85,6 +86,7 @@
                                         <td>{{ $item->name ?? '-' }}</td>
                                         <td>{{ $item->telepon ?? '-' }}</td>
                                         <td>{{ $item->alamat ?? '-' }}</td>
+                                        <td>{{ $item->nama_bank ?? '' }} - {{ $item->rekening ?? ''  }} </td>
                                         {{--
                                         <td>{{ $item->no_ktp ?? '-' }}</td>
                                         <td>

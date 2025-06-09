@@ -20,6 +20,8 @@ class Supir extends Model
         'alamat',
         'no_ktp',
         'no_sim',
+        'nama_bank',
+        'rekening',
         'path_photo_diri',
         'path_photo_ktp',
         'path_photo_sim',

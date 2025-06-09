@@ -16,7 +16,7 @@
                             @csrf                       
                             <div class="row">
                                 {{-- Foto Diri --}}
-                                <div class="col-md-12 mb-2">
+                                {{-- <div class="col-md-12 mb-2">
                                     <label for="photo_diri" class="form-label">Foto Diri</label>
                                     <input type="file" class="form-control @error('photo_diri') is-invalid @enderror" 
                                         id="photo_diri" name="photo_diri" accept=".jpg,.jpeg,.png">                                    
@@ -30,37 +30,17 @@
                                             class="img-thumbnail" 
                                             width="150"
                                             style="display: none;"
-                                            {{-- data-old-src="{{ $supir->path_photo_diri ? asset($supir->path_photo_diri) : '' }}" --}}
+                                            data-old-src="{{ $supir->path_photo_diri ? asset($supir->path_photo_diri) : '' }}"
                                             >
                                     </div>
-                                </div>
+                                </div> --}}
                                 
                                 {{-- Nama Supir --}}
                                 <div class="col-md-6 mb-2">
                                     <label for="name" class="form-label">Nama Supir <span style="color: red;">*</span></label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                           id="name" name="name" required>
+                                           id="name" name="name">
                                     @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                        
-                                {{-- Telepon --}}
-                                <div class="col-md-6 mb-2">
-                                    <label for="telepon" class="form-label">Telepon <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control @error('telepon') is-invalid @enderror" 
-                                           id="telepon" name="telepon" required>
-                                    @error('telepon')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                        
-                                {{-- Alamat --}}
-                                <div class="col-md-6 mb-2">
-                                    <label for="alamat" class="form-label">Alamat <span style="color: red;">*</span></label>
-                                    <textarea class="form-control @error('alamat') is-invalid @enderror" 
-                                              id="alamat" name="alamat" rows="1" required></textarea>
-                                    @error('alamat')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -137,7 +117,7 @@
 
                                 <div class="col-md-6 mb-3">
                                     <label for="is_active" class="form-label">Status Supir</label>
-                                    <select class="form-control @error('is_active') is-invalid @enderror" name="is_active" id="is_active" required>
+                                    <select class="form-control @error('is_active') is-invalid @enderror" name="is_active" id="is_active">
                                         <option value="" disabled>-- Pilih Status --</option>
                                         <option value="1">Aktif</option>
                                         <option value="0">Tidak Aktif</option>

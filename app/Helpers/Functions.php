@@ -120,20 +120,20 @@ class Functions
 
     public static function generateMuatanMerge() 
     {
-        $semuaMuatan = Perjalanan::pluck('muatan')->toArray();
+        // $semuaMuatan = Perjalanan::pluck('muatan')->toArray();
 
-        $semuaMuatanArray = [];
-        foreach ($semuaMuatan as $item) {
-            $parts = explode(',', $item);
-            $trimmed = array_map('trim', $parts);
-            $semuaMuatanArray = array_merge($semuaMuatanArray, $trimmed);
-        }
+        // $semuaMuatanArray = [];
+        // foreach ($semuaMuatan as $item) {
+        //     $parts = explode(',', $item);
+        //     $trimmed = array_map('trim', $parts);
+        //     $semuaMuatanArray = array_merge($semuaMuatanArray, $trimmed);
+        // }
         $muatanDefault = config('constants.muatan');
-        $customMuatan = array_diff($semuaMuatanArray, $muatanDefault);
-        $muatanCustomUnique = array_values(array_unique($customMuatan));
-        $muatanMerged = array_values(array_unique(array_merge($muatanDefault, $muatanCustomUnique)));
+        // $customMuatan = array_diff($semuaMuatanArray, $muatanDefault);
+        // $muatanCustomUnique = array_values(array_unique($customMuatan));
+        // $muatanMerged = array_values(array_unique(array_merge($muatanDefault, $muatanCustomUnique)));
 
-        return $muatanMerged;
+        return $muatanDefault;
 
     }
 }

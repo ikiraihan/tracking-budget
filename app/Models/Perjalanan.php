@@ -29,6 +29,7 @@ class Perjalanan extends Model
         'uang_setoran_tambahan',
         'path_struk_kembali',
         'path_bukti_pembayaran',
+        'last_updated_bukti_pembayaran',
         'status_slug',
         'is_done',
     ];

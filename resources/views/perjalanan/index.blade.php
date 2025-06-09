@@ -135,6 +135,9 @@
                                             </a>
                                             @if(in_array($role,['owner']))
                                                 @if($item->status_slug == 'proses-reimburse')
+                                                    <a href="/perjalanan/edit/{{ $item->id }}" class="btn btn-warning-transparent">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
                                                     <button class="btn btn-success-transparent" data-id="{{ $item->id }}" data-bs-toggle="modal" data-bs-target="#verifikasiReimburse">
                                                         Verifikasi?
                                                     </button>
@@ -156,7 +159,7 @@
                                                 @endif
                                             @elseif(in_array($role,['admin']))
                                                 @if($item->status_slug == 'proses-pembayaran')
-                                                    <button class="btn btn-success-transparent" data-id="{{ $item->id }}" data-bs-toggle="modal" data-bs-target="#verifikasiPembayaran">
+                                                    <button class="btn btn-success-transparent" data-id="{{ $item->id }}" data-supir_info_rekening="{{ $item->supir_info_rekening }}" data-bs-toggle="modal" data-bs-target="#verifikasiPembayaran">
                                                         Verifikasi?
                                                     </button>
                                                 {{-- @else
@@ -323,9 +326,9 @@
                     <button type="button" class="btn btn-success me-2" id="btn-verifikasi" data-id="{{ $item->id }}">
                         Ya
                     </button>
-                    <button type="button" class="btn btn-danger me-2" id="btn-tolak" data-id="{{ $item->id }}">
+                    {{-- <button type="button" class="btn btn-danger me-2" id="btn-tolak" data-id="{{ $item->id }}">
                         Tidak
-                    </button>
+                    </button> --}}
                 @endif
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Batal
@@ -347,6 +350,10 @@
                 </div>
 
                 <div class="modal-body text-center">
+                    <div id="supirRekeningInfo" class="mb-3">
+                        <strong>Info Rekening Supir:</strong>
+                        <div id="rekeningContent"></div>
+                    </div>
                     <label class="form-label" for="uang_kembali"><span style="color: red;">*</span>Foto tidak boleh lebih dari 4 MB!</label>
                     <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*" class="form-control form-control-lg mb-3" required>
                     <div class="mt-2">
@@ -439,13 +446,20 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('verifikasiPembayaran');
+    
     modal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const id = button.getAttribute('data-id');
+        const rekening = button.getAttribute('data-supir_info_rekening');
         const form = document.getElementById('verifikasiForm');
+
         form.setAttribute('action', `/perjalanan/pembayaran/${id}`);
+        
+        // Set text content ke div rekeningContent
+        document.getElementById('rekeningContent').textContent = rekening || 'Tidak tersedia';
     });
 });
+
 </script>
 
 {{-- @push('scripts')

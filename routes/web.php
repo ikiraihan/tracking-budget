@@ -88,6 +88,8 @@ Route::middleware(['auth', 'role:1,2,3'])->group(function () { //admin , owner, 
 Route::middleware(['auth', 'role:3'])->group(function () { //supir
     Route::get('perjalanan/form', [PerjalananController::class, 'formIndex'])->name('perjalanan.form_index');
 
+    Route::get('supir/form/{id}', [SupirController::class, 'form'])->name('supir.form');
+    Route::put('supir/update/{id}', [SupirController::class, 'update'])->name('supir.update');
 });
 
 // Route::get('/kota', [KotaController::class, 'getKotaByProvinsi']);

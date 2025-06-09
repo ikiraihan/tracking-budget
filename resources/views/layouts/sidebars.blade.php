@@ -95,6 +95,15 @@
                         </a>
                     </li>
                     @endif
+                    @if(Auth::check() && in_array(Auth::user()->role_id,[3]))
+                        <li class="slide__category"><span class="category-name">Data</span></li>
+                        <li class="slide">
+                            <a href="/supir/form/{{ Auth::user()->supir->id }}" class="side-menu__item {{ request()->routeIs('supir.form') ? 'active' : '' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                <span class="side-menu__label">Data Diri</span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             <div class="slide-right" id="slide-right"><svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191"
                     width="24" height="24" viewBox="0 0 24 24">

@@ -67,6 +67,7 @@ class PerjalananController extends Controller
                 'supir_id'        => $perjalanan->supir_id,
                 'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
                 'supir_telepon'   => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
+                'supir_info_rekening' => $perjalanan->supir && $perjalanan->supir->rekening && $perjalanan->supir->nama_bank ? $perjalanan->supir->nama_bank. ' - ' .$perjalanan->supir->rekening : null,
                 'muatan'          => $perjalanan->muatan ? $perjalanan->muatan : null,
 
                 'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
@@ -93,6 +94,7 @@ class PerjalananController extends Controller
 
                 'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
                 'path_bukti_pembayaran'      => $perjalanan->path_bukti_pembayaran ? $perjalanan->path_bukti_pembayaran : null,
+                'last_updated_bukti_pembayaran'      => $perjalanan->last_updated_bukti_pembayaran ? $perjalanan->last_updated_bukti_pembayaran : null,
                 
                 'status_nama'        => $status ? $status->nama : null,
                 'status_slug'        => $status ? $status->slug : null,
@@ -145,6 +147,7 @@ class PerjalananController extends Controller
                 'supir_id'        => $perjalanan->supir_id,
                 'supir_nama'      => $perjalanan->supir && $perjalanan->supir->nama ? $perjalanan->supir->nama : null,
                 'supir_telepon'   => $perjalanan->supir && $perjalanan->supir->telepon ? $perjalanan->supir->telepon : null,
+                'supir_info_rekening' => $perjalanan->supir && $perjalanan->supir->rekening && $perjalanan->supir->nama_bank ? $perjalanan->supir->nama_bank. ' - ' .$perjalanan->supir->rekening : null,
                 'muatan'          => $perjalanan->muatan ? $perjalanan->muatan : null,
 
                 'tanggal_berangkat'=> $perjalanan->tanggal_berangkat ? Carbon::parse($perjalanan->tanggal_berangkat): null,
@@ -171,7 +174,8 @@ class PerjalananController extends Controller
 
                 'path_struk_kembali'      => $perjalanan->path_struk_kembali ? $perjalanan->path_struk_kembali : null,
                 'path_bukti_pembayaran'      => $perjalanan->path_bukti_pembayaran ? $perjalanan->path_bukti_pembayaran : null,
-                
+                'last_updated_bukti_pembayaran'      => $perjalanan->last_updated_bukti_pembayaran ? Carbon::parse($perjalanan->last_updated_bukti_pembayaran)->translatedFormat('d F Y H:i:s') : null,
+
                 'status_nama'        => $status ? $status->nama : null,
                 'status_slug'        => $status ? $status->slug : null,
                 'status_color'       => $statusColor,
@@ -215,9 +219,16 @@ class PerjalananController extends Controller
         $role = $user->role->slug;
         $supirId = $user->supir && $user->supir->id ? $user->supir->id : null;
         $trukId = $user->supir && $user->supir->truk_id ? $user->supir->truk_id : null;
+        $supir = $user->supir ? $user->supir : null;
+        $namaBank = $supir ? $supir->nama_bank : null;
+        $rekening = $supir ? $supir->rekening : null;
 
         try {
             DB::beginTransaction();
+
+            if ( $namaBank == null && $rekening == null) {
+                throw new Exception('Perbarui Data Diri anda terlebih dahulu!');
+            }
 
             $rules = [
                 'tanggal_berangkat' => 'required|date',
@@ -453,10 +464,12 @@ class PerjalananController extends Controller
                 if (!file_exists($destination)) mkdir($destination, 0755, true);
                 $file->move($destination, $filename);
                 $path = '/uploads/perjalanan/struk/' . $filename;
+                $date = Carbon::now('Asia/Jakarta');
             }
 
             $perjalanan->update([
                 'path_bukti_pembayaran' => $path,
+                'last_updated_bukti_pembayaran' => $date,
                 'status_slug' => 'selesai',
             ]);
 

@@ -44,9 +44,9 @@
                                         <td>
                                             <div class="btn-list">
                                                 <a href="/truk/detail/{{ $item->id }}" class="btn btn-teal-transparent"><i class="fa-solid fa-eye"></i></a>
-                                                @if($role == 'admin')
+                                                {{-- @if($role == 'admin') --}}
                                                 <a href="/truk/edit/{{ $item->id }}" class="btn btn-warning-transparent"><i class="fas fa-edit"></i></a>
-                                                @endif
+                                                {{-- @endif --}}
                                                 {{-- <form action="/truk/delete/{{ $item->id }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('delete')
@@ -94,7 +94,7 @@
                                         <td>
                                             <div class="btn-list">
                                                 <a href="/truk/detail/{{ $item->id }}" class="btn btn-teal-transparent"><i class="fa-solid fa-eye"></i></a>
-                                                @if($role == 'admin')
+                                                {{-- @if($role == 'admin') --}}
                                                 <a href="/truk/edit/{{ $item->id }}" class="btn btn-warning-transparent"><i class="fas fa-edit"></i></a>
                                                 <form action="/truk/delete/{{ $item->id }}" method="POST" class="d-inline">
                                                     @csrf
@@ -103,7 +103,7 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
-                                                @endif
+                                                {{-- @endif --}}
                                             </div>
                                         </td>
                                         <td>

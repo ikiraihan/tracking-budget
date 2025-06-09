@@ -32,6 +32,8 @@ class SupirController extends Controller
                 'alamat' => $supir->alamat,
                 'no_ktp' => $supir->no_ktp,
                 'no_sim' => $supir->no_sim,
+                'nama_bank' => $supir->nama_bank,
+                'rekening' => $supir->rekening,
                 'path_photo_diri' => $supir->path_photo_diri,
                 'path_photo_ktp' => $supir->path_photo_ktp,
                 'path_photo_sim' => $supir->path_photo_sim,
@@ -52,6 +54,8 @@ class SupirController extends Controller
                 'alamat' => $supir->alamat,
                 'no_ktp' => $supir->no_ktp,
                 'no_sim' => $supir->no_sim,
+                'nama_bank' => $supir->nama_bank,
+                'rekening' => $supir->rekening,
                 'path_photo_diri' => $supir->path_photo_diri,
                 'path_photo_ktp' => $supir->path_photo_ktp,
                 'path_photo_sim' => $supir->path_photo_sim,
@@ -87,6 +91,8 @@ class SupirController extends Controller
                 'alamat' => 'nullable|string|max:255',
                 'no_ktp' => 'nullable|string|max:100',
                 'no_sim' => 'nullable|string|max:100',
+                'nama_bank' => 'nullable|string|max:100',
+                'rekening' => 'nullable|string|max:100',
                 'photo_diri' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
                 'photo_ktp' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
                 'photo_sim' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
@@ -109,6 +115,8 @@ class SupirController extends Controller
             $supir->alamat = $request->alamat;
             $supir->no_ktp = $request->no_ktp;
             $supir->no_sim = $request->no_sim;
+            $supir->nama_bank = $request->nama_bank;
+            $supir->rekening = $request->rekening;
     
             if ($request->hasFile('photo_diri') && $request->file('photo_diri')->isValid()) {
                 $file = $request->file('photo_diri');
@@ -200,6 +208,15 @@ class SupirController extends Controller
         ]);
     }
 
+    public function form($id)
+    {
+        $supir = Supir::findOrFail($id);
+        $truks = Truk::get();
+        $user = User::find($supir->user_id);
+
+        return view('supir.form', compact('supir','truks', 'user'));
+    }
+
     public function edit($id)
     {
         $supir = Supir::findOrFail($id);
@@ -211,6 +228,7 @@ class SupirController extends Controller
 
     public function update(Request $request, $id)
     {
+        $user = Auth::user();
         try {
             $request->validate([
                 'nama' => 'required|string|max:255',
@@ -218,6 +236,8 @@ class SupirController extends Controller
                 'alamat' => 'required|string|max:255',
                 'no_ktp' => 'nullable|string|max:100',
                 'no_sim' => 'nullable|string|max:100',
+                'nama_bank' => 'nullable|string|max:100',
+                'rekening' => 'nullable|string|max:100',
                 'truk_id' => 'required|exists:truk,id',
                 'photo_diri' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
                 'photo_ktp' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
@@ -232,6 +252,8 @@ class SupirController extends Controller
             $supir->no_ktp = $request->no_ktp;
             $supir->no_sim = $request->no_sim;
             $supir->truk_id = $request->truk_id;
+            $supir->nama_bank = $request->nama_bank;
+            $supir->rekening = $request->rekening;
             $supir->is_active = $request->is_active ?? true;
 
             if ($request->hasFile('photo_diri') && $request->file('photo_diri')->isValid()) {
@@ -263,7 +285,11 @@ class SupirController extends Controller
 
             $supir->save();
 
+            if(in_array($user->role_id,[1,2]))
             return redirect()->route('supir.index')->with('success', 'Data supir berhasil diperbarui!');
+            else
+            return redirect()->back()->with('success', 'Data berhasil diperbarui!');
+
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with(['error' => 'Terjadi kesalahan saat memperbarui data. Pesan: ' . $e->getMessage()]);
         }

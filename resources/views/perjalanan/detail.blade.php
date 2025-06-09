@@ -261,6 +261,11 @@
                                     <a href="{{ asset($perjalanan->path_bukti_pembayaran) }}" target="_blank" style="color: blue; text-decoration: underline;">
                                         Lihat File
                                     </a>
+                                    @if($perjalanan->last_updated_bukti_pembayaran)  
+                                        <span style="margin: 5px; opacity: 0.8; font-size: 14px;">
+                                            <em>({{ $perjalanan->last_updated_bukti_pembayaran }})</em>
+                                        </span>
+                                    @endif  
                                     @else
                                         -
                                     @endif                          
@@ -306,6 +311,16 @@
                                 </div>
                                 <div class="col-md-9">
                                     <input type="text" class="form-control bg-light" value="{{ $perjalanan->supir_telepon ?? '-'}}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-medium">Info. Rekening</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control bg-light" value="{{ $perjalanan->supir_info_rekening ?? '-'}}" readonly>
                                 </div>
                             </div>
                         </div>
